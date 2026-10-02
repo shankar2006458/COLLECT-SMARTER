@@ -629,6 +629,19 @@
     (function () {
       "use strict";
 
+      // Always start the page at the top after refresh/navigation
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+
+      window.addEventListener("pageshow", () => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "auto"
+        });
+      });
+
       /* ------------------------------------------------------------------ *
        * Constants & state
        * ------------------------------------------------------------------ */
@@ -823,15 +836,34 @@
 
         el.detailsTab.classList.toggle("is-active", detailsActive);
         el.summaryTab.classList.toggle("is-active", !detailsActive);
+
         el.detailsTab.setAttribute("aria-selected", String(detailsActive));
         el.summaryTab.setAttribute("aria-selected", String(!detailsActive));
+
         el.detailsTab.tabIndex = detailsActive ? 0 : -1;
         el.summaryTab.tabIndex = detailsActive ? -1 : 0;
 
-        const visiblePanel = detailsActive ? el.detailsPanel : el.summaryPanel;
+        const visiblePanel = detailsActive
+          ? el.detailsPanel
+          : el.summaryPanel;
+
         visiblePanel.classList.remove("panel-enter");
         void visiblePanel.offsetWidth;
         visiblePanel.classList.add("panel-enter");
+
+        // Scroll the dashboard back to the top when switching tabs
+        requestAnimationFrame(() => {
+          const dashboard = document.querySelector(".dashboard-card");
+
+          if (dashboard) {
+            const top = dashboard.getBoundingClientRect().top + window.scrollY;
+
+            window.scrollTo({
+              top: Math.max(0, top - 16),
+              behavior: "smooth"
+            });
+          }
+        });
       }
 
       function handleTabKeys(event) {
