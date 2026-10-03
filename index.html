@@ -121,20 +121,165 @@
 
     #print-area { display: none; }
 
-    @media print {
-      body { background: #fff !important; }
-      .app-shell { display: none !important; }
-      #print-area { display: block !important; color: #16121f; padding: 18px; }
-      .print-head { border-bottom: 2px solid #28196b; padding-bottom: 14px; margin-bottom: 18px; }
-      .print-head h1 { font-size: 24px; margin: 0 0 7px; }
-      .print-head p { margin: 3px 0; font-size: 12px; color: #4a4355; }
-      .print-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-      .print-card { break-inside: avoid; border: 1px solid #d8d3e1; border-radius: 12px; padding: 16px; text-align: center; }
-      .print-card h2 { margin: 0 0 6px; font-size: 15px; }
-      .print-card img { width: 170px; height: 170px; margin: 10px auto; image-rendering: pixelated; }
-      .print-card p { margin: 4px 0; font-size: 12px; }
-      .print-amount { color: #4021a8; font-size: 19px !important; font-weight: 700; }
-    }
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #16121f;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .app-shell { display: none !important; }
+
+  #print-area {
+    display: block !important;
+    padding: 0;
+    font-family: "Work Sans", Arial, sans-serif;
+  }
+
+  /* ---------- Header ---------- */
+  .print-head {
+    border-bottom: 3px solid #28196b;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    page-break-after: avoid;
+  }
+  .print-head .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .print-head .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6d4aff 0%, #4725b3 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .print-head .brand-text {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #5b35cc;
+    text-transform: uppercase;
+  }
+  .print-head h1 {
+    font-size: 22px;
+    margin: 4px 0 10px;
+    color: #1f1b33;
+    line-height: 1.15;
+  }
+  .print-head .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 24px;
+    font-size: 12px;
+    color: #4a4355;
+  }
+  .print-head .meta-grid p { margin: 0; }
+  .print-head .meta-grid strong { color: #1f1b33; }
+
+  /* ---------- Cards ---------- */
+  .print-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .print-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #d8d3e1;
+    border-radius: 12px;
+    padding: 14px 14px 12px;
+    text-align: center;
+    position: relative;
+  }
+  .print-card::after {
+    /* dashed cut line so you can trim cleanly */
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed #ece8f4;
+    border-radius: 9px;
+    pointer-events: none;
+  }
+
+  .print-card .step-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5b35cc;
+    margin-bottom: 4px;
+  }
+
+  .print-amount {
+    color: #4021a8;
+    font-size: 20px !important;
+    font-weight: 700;
+    margin: 2px 0 8px;
+  }
+
+  .print-card img {
+    width: 160px;
+    height: 160px;
+    margin: 6px auto 8px;
+    image-rendering: pixelated;
+    display: block;
+  }
+
+  .print-card .qr-note {
+    font-size: 10.5px;
+    color: #6f6a80;
+    margin: 4px 0;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .print-card .divider {
+    border-top: 1px solid #ece8f4;
+    margin: 8px 0 6px;
+  }
+
+  .print-card .upi-line {
+    font-size: 11px;
+    color: #1f1b33;
+    font-weight: 600;
+    word-break: break-all;
+    margin: 0;
+  }
+
+  .print-card .account-line {
+    font-size: 10.5px;
+    color: #4a4355;
+    margin: 3px 0 0;
+  }
+
+  /* ---------- Footer ---------- */
+  .print-foot {
+    margin-top: 18px;
+    padding-top: 10px;
+    border-top: 1px solid #d8d3e1;
+    font-size: 10.5px;
+    color: #6f6a80;
+    text-align: center;
+    page-break-before: avoid;
+  }
+  .print-foot strong { color: #1f1b33; }
+}
 
     [aria-live]:empty { display: none; }
 
@@ -210,6 +355,269 @@
     }
 
     body.modal-open { overflow: hidden; }
+
+    /* ------------------------------------------------------------------ *
+     * Collection progress + payment checklist
+     * ------------------------------------------------------------------ */
+
+    .progress-card {
+      transition: border-color .45s ease, box-shadow .45s ease, background .45s ease;
+    }
+    .progress-card.is-complete {
+      border-color: #a7e8c8;
+      background: linear-gradient(180deg, #f3fdf8 0%, #ffffff 72%);
+      box-shadow: 0 18px 42px rgba(16, 185, 129, .15);
+    }
+
+    .progress-track {
+      position: relative;
+      height: 12px;
+      width: 100%;
+      border-radius: 9999px;
+      background: #efecf8;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(41, 28, 83, .10);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #7c5cff 0%, #5b35cc 35%, #9b7dff 70%, #5b35cc 100%);
+      background-size: 220% 100%;
+      transition: width .7s cubic-bezier(.22, 1, .36, 1), background .45s ease;
+      animation: progressFlow 3.2s linear infinite;
+      will-change: width, background-position;
+    }
+
+    @keyframes progressFlow {
+      from { background-position: 0% 50%; }
+      to   { background-position: 220% 50%; }
+    }
+
+    .progress-card.is-complete .progress-fill {
+      background: linear-gradient(90deg, #34d399 0%, #10b981 35%, #86efac 70%, #10b981 100%);
+      background-size: 220% 100%;
+    }
+
+    #progress-percent { transition: color .35s ease; }
+    .progress-card.is-complete #progress-percent { color: #047857; }
+
+    .pop-in { animation: popIn .42s cubic-bezier(.22, 1.4, .4, 1) both; }
+    @keyframes popIn {
+      0%   { transform: scale(.82); opacity: .55; }
+      60%  { transform: scale(1.10); opacity: 1; }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+
+    /* Checklist pills */
+    .checklist-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .35rem .7rem;
+      border-radius: 9999px;
+      font-size: .75rem;
+      font-weight: 600;
+      line-height: 1;
+      color: #6f6a80;
+      background: #f5f3fb;
+      border: 1px solid #e6e3ed;
+      transition: background .3s ease, color .3s ease, border-color .3s ease,
+                  transform .35s cubic-bezier(.22, 1.4, .4, 1), box-shadow .3s ease;
+    }
+    .checklist-pill.is-done {
+      background: #e7f9f1;
+      color: #06794f;
+      border-color: #a7e8c8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(16, 185, 129, .16);
+    }
+    .pill-check {
+      width: 12px;
+      height: 12px;
+      flex: none;
+      opacity: 0;
+      transform: scale(.2) rotate(-25deg);
+      transition: opacity .22s ease, transform .35s cubic-bezier(.22, 1.4, .4, 1);
+    }
+    .checklist-pill.is-done .pill-check {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    /* QR cards */
+    .qr-card {
+      transition: border-color .35s ease, background .35s ease, box-shadow .35s ease, transform .3s ease;
+    }
+    .qr-card.is-complete {
+      border-color: #a7e8c8;
+      background: linear-gradient(180deg, #f6fdf9 0%, #ffffff 60%);
+      box-shadow: 0 12px 28px rgba(16, 185, 129, .13);
+    }
+    .qr-card.just-checked { animation: cardPaid .48s cubic-bezier(.22, 1, .36, 1); }
+    @keyframes cardPaid {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.015); box-shadow: 0 16px 34px rgba(16, 185, 129, .24); }
+      100% { transform: scale(1); }
+    }
+
+    /* "Mark as paid" toggle */
+    .paid-toggle {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      width: 100%;
+      margin-top: .85rem;
+      padding: .8rem .9rem;
+      border-radius: .9rem;
+      border: 1.5px solid #e2ded0;
+      border-color: #e6e3ed;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .28s ease, border-color .28s ease,
+                  transform .18s ease, box-shadow .28s ease;
+    }
+    .paid-toggle:hover { background: #faf9ff; border-color: #cfc6ea; }
+    .paid-toggle:active { transform: scale(.98); }
+    .paid-toggle:focus-within {
+      outline: 3px solid rgba(91, 53, 204, .25);
+      outline-offset: 2px;
+    }
+    .paid-toggle.is-paid { background: #f2fdf8; border-color: #a7e8c8; }
+    .paid-toggle.is-paid:hover { background: #eafaf3; }
+
+    .paid-checkbox {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .paid-toggle-box {
+      position: relative;
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 9999px;
+      border: 2px solid #d5cfe6;
+      background: #fff;
+      transition: background .28s ease, border-color .28s ease,
+                  transform .38s cubic-bezier(.22, 1.5, .4, 1), box-shadow .28s ease;
+    }
+    .paid-toggle-box svg {
+      width: 14px;
+      height: 14px;
+      stroke: #fff;
+      opacity: 0;
+      transform: scale(.3) rotate(-28deg);
+      transition: opacity .2s ease, transform .38s cubic-bezier(.22, 1.5, .4, 1);
+    }
+    .paid-toggle.is-paid .paid-toggle-box {
+      background: #10b981;
+      border-color: #10b981;
+      transform: scale(1.07);
+      box-shadow: 0 6px 14px rgba(16, 185, 129, .34);
+    }
+    .paid-toggle.is-paid .paid-toggle-box svg {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    .paid-toggle-text {
+      font-size: .875rem;
+      font-weight: 600;
+      color: #4a4355;
+      transition: color .28s ease;
+    }
+    .paid-toggle.is-paid .paid-toggle-text { color: #06794f; }
+
+        /* ------------------------------------------------------------------ *
+     * Scroll-to-QR floating button (Payment Summary only)
+     * ------------------------------------------------------------------ */
+
+    .scroll-to-qr {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 80;
+      width: 52px;
+      height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 9999px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #6d4aff 0%, #4725b3 100%);
+      box-shadow:
+        0 6px 16px rgba(91, 53, 204, 0.32),
+        0 2px 6px rgba(41, 28, 83, 0.18);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(16px) scale(0.85);
+      transition:
+        opacity .28s ease,
+        transform .34s cubic-bezier(.22, 1.4, .4, 1),
+        visibility 0s linear .28s,
+        box-shadow .2s ease,
+        background .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scroll-to-qr.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity .28s ease,
+        transform .34s cubic-bezier(.22, 1.4, .4, 1),
+        visibility 0s linear 0s,
+        box-shadow .2s ease,
+        background .2s ease;
+    }
+
+    .scroll-to-qr:hover {
+      box-shadow:
+        0 10px 22px rgba(91, 53, 204, 0.42),
+        0 3px 8px rgba(41, 28, 83, 0.22);
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    .scroll-to-qr:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .scroll-to-qr:focus-visible {
+      outline: 3px solid rgba(91, 53, 204, .35);
+      outline-offset: 3px;
+    }
+
+    /* Slightly smaller on phones */
+    @media (max-width: 480px) {
+      .scroll-to-qr {
+        right: 16px;
+        bottom: 16px;
+        width: 46px;
+        height: 46px;
+      }
+    }
+
+    /* Never show in print */
+    @media print {
+      .scroll-to-qr { display: none !important; }
+    }
 
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -499,6 +907,51 @@
               <span id="summary-note-value"></span>
             </div>
 
+            <!-- ============================================================ -->
+            <!-- Collection progress + interactive checklist                  -->
+            <!-- ============================================================ -->
+            <div id="progress-card" class="progress-card mb-8 hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+                <div class="min-w-0">
+                  <p class="text-xs font-bold uppercase tracking-[0.14em]"
+                     style="color: rgb(91, 53, 204); font-weight: 700; font-size: 12px; letter-spacing: 0.12rem;">
+                    Collection Progress
+                  </p>
+                  <p class="mt-2 flex flex-wrap items-baseline gap-x-2">
+                    <span id="progress-amount" class="text-2xl font-bold text-slate-900">₹0</span>
+                    <span class="text-sm font-medium text-slate-500">
+                      / <span id="progress-total">₹0</span> collected
+                    </span>
+                  </p>
+                </div>
+                <p id="progress-percent" class="text-3xl font-bold text-indigo-700">0%</p>
+              </div>
+
+              <div id="progress-track" class="progress-track mt-4" role="progressbar"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                   aria-label="Collection progress">
+                <div id="progress-fill" class="progress-fill"></div>
+              </div>
+
+              <div class="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <p id="progress-count" class="text-sm font-semibold text-slate-600" aria-live="polite">
+                  0 of 0 payments completed
+                </p>
+                <button id="progress-clear" type="button"
+                        class="hidden text-xs font-bold underline decoration-dotted underline-offset-4"
+                        style="color: rgb(91, 53, 204);">
+                  Clear checklist
+                </button>
+              </div>
+
+              <div id="progress-checklist" class="mt-4 flex flex-wrap gap-2" aria-hidden="true"></div>
+
+              <p class="mt-4 text-xs leading-5 text-slate-500">
+                Tick <span class="font-semibold text-slate-700">Mark as paid</span> on each QR code as the money arrives —
+                your progress updates instantly.
+              </p>
+            </div>
+
             <p id="summary-status" class="mb-5 text-sm font-medium text-rose-600" aria-live="assertive"></p>
 
             <!-- QR list heading -->
@@ -623,7 +1076,63 @@
     </div>
   </div>
 
+  <!-- Confirm Reset modal -->
+  <div id="confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true"
+       aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-desc"
+       aria-hidden="true">
+    <div class="modal-panel" role="document" style="max-width: 460px;">
+
+      <div class="flex items-start gap-3 border-b border-rose-100 bg-rose-50 px-5 py-4 sm:px-6">
+        <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-rose-600 text-white" aria-hidden="true">
+          <i data-lucide="alert-triangle" style="width:20px;height:20px"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="confirm-modal-title" class="font-bold"
+              style="color: rgb(120, 15, 40); font-weight: 700; font-size: 18px;">
+            Reset everything?
+          </h3>
+          <p id="confirm-modal-desc" class="mt-0.5 text-sm" style="color: rgb(150, 40, 70); font-weight: 400;">
+            This will clear your payment details and all generated QR codes.
+          </p>
+        </div>
+      </div>
+
+      <div class="px-5 py-5 sm:px-6">
+        <p class="text-sm leading-6" style="color: rgb(72, 66, 88); font-weight: 400;">
+          You'll need to re-enter the UPI ID, account holder name, amount, and note to generate new QR codes.
+          <strong style="font-weight: 600;">This action cannot be undone.</strong>
+        </p>
+      </div>
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <button id="confirm-cancel" type="button"
+                class="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-semibold"
+                style="background: rgb(255, 255, 255); color: rgb(64, 57, 77);">
+          <span style="color: rgb(64, 57, 77); font-weight: 600; font-size: 14px;">Cancel</span>
+        </button>
+
+        <button id="confirm-reset" type="button"
+                class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-semibold text-white"
+                style="background: rgb(220, 38, 88); color: rgb(255, 255, 255); transition: transform .18s ease, background .18s ease, box-shadow .18s ease;"
+                onmouseover="this.style.background='rgb(190, 25, 72)'; this.style.boxShadow='0 12px 24px rgba(220,38,88,.22)'; this.style.transform='translateY(-1px)';"
+                onmouseout="this.style.background='rgb(220, 38, 88)'; this.style.boxShadow='none'; this.style.transform='none';">
+          <i data-lucide="rotate-ccw" style="width:17px;height:17px" aria-hidden="true"></i>
+          <span style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px;">Yes, Reset</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <aside id="print-area" aria-hidden="true"></aside>
+
+  <!-- Scroll to Collection Progress button (Payment Summary only) -->
+  <button id="scroll-to-qr" type="button"
+          class="scroll-to-qr"
+          aria-label="Scroll up to Collection Progress"
+          title="Back to Collection Progress">
+    <i data-lucide="arrow-up" style="width:20px;height:20px" aria-hidden="true"></i>
+  </button>
 
   <script>
     (function () {
@@ -652,8 +1161,11 @@
 
       const state = {
         payments: [],   // [{ paise, uri }]
-        details: null   // { upi, name, amountPaise, note }
+        details: null,  // { upi, name, amountPaise, note }
+        completed: []   // [Boolean] — one flag per generated QR code
       };
+
+      let lastPercentShown = -1;
 
       const el = {
         form: document.getElementById("payment-form"),
@@ -681,8 +1193,22 @@
         noteRow: document.getElementById("note-summary-row"),
         noteValue: document.getElementById("summary-note-value"),
         qrGrid: document.getElementById("qr-grid"),
-        printArea: document.getElementById("print-area")
+        printArea: document.getElementById("print-area"),
+
+        // Progress + checklist
+        progressCard: document.getElementById("progress-card"),
+        progressAmount: document.getElementById("progress-amount"),
+        progressTotal: document.getElementById("progress-total"),
+        progressPercent: document.getElementById("progress-percent"),
+        progressCount: document.getElementById("progress-count"),
+        progressTrack: document.getElementById("progress-track"),
+        progressFill: document.getElementById("progress-fill"),
+        progressChecklist: document.getElementById("progress-checklist"),
+        progressClear: document.getElementById("progress-clear")
       };
+      const confirmModal = document.getElementById("confirm-modal");
+      const confirmResetBtn = document.getElementById("confirm-reset");
+      const confirmCancelBtn = document.getElementById("confirm-cancel");
 
       /* ------------------------------------------------------------------ *
        * Small utilities
@@ -693,6 +1219,27 @@
       /** Escape user-supplied text before it is placed into innerHTML. */
       function escapeHtml(value) {
         return String(value == null ? "" : value).replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch]);
+      }
+
+      /** Turn arbitrary text into a safe filename chunk. */
+      function slugify(value, maxLen = 30) {
+        return String(value == null ? "" : value)
+          .normalize("NFKD")
+          .replace(/[^\w\s.-]/g, "")      // drop emoji, / \ : * ? " < > | etc.
+          .trim()
+          .replace(/\s+/g, "-")           // spaces -> dashes
+          .replace(/-+/g, "-")            // collapse repeats
+          .replace(/^[-.]+|[-.]+$/g, "")  // no leading/trailing dots or dashes
+          .slice(0, maxLen);
+      }
+
+      /** Local timestamp like 03-10-2026_1432 (dd-mm-yyyy_hhmm) */
+      function fileStamp(date = new Date()) {
+        const p = (n) => String(n).padStart(2, "0");
+        return (
+          p(date.getDate()) + "-" + p(date.getMonth() + 1) + "-" + date.getFullYear() +
+          "_" + p(date.getHours()) + p(date.getMinutes())
+        );
       }
 
       function setStatus(node, message, tone) {
@@ -862,6 +1409,7 @@
               top: Math.max(0, top - 16),
               behavior: "smooth"
             });
+            updateScrollButton();
           }
         });
       }
@@ -912,6 +1460,16 @@
         }
       }
 
+      const PILL_CHECK_SVG =
+        '<svg class="pill-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+      const TOGGLE_CHECK_SVG =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+
       function renderQRCodes() {
         el.qrGrid.innerHTML = "";
 
@@ -920,9 +1478,19 @@
 
         state.payments.forEach((payment, index) => {
           const card = document.createElement("article");
-          card.className = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
           const isSplit = total > 1;
           const stepNumber = index + 1;
+          const isPaid = Boolean(state.completed[index]);
+
+          card.className =
+            "qr-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" +
+            (isPaid ? " is-complete" : "");
+
+          const hintText = isSplit
+            ? "Have the payer scan this " +
+              (stepNumber === 1 ? "first" : stepNumber === total ? "last" : "next") +
+              " QR code for " + escapeHtml(formatINR(payment.paise)) + "."
+            : "Have the payer scan this QR code to pay " + escapeHtml(formatINR(payment.paise)) + ".";
 
           card.innerHTML =
             '<div class="mb-4 flex items-start justify-between gap-3">' +
@@ -945,12 +1513,7 @@
               ' aria-label="UPI QR code for payment ' + stepNumber + " of " + total + '"></div>' +
             '<div class="mt-5 border-t border-slate-100 pt-4">' +
               '<p class="break-all text-sm font-medium text-slate-700">' + upi + "</p>" +
-              '<p class="mt-2 text-xs leading-5 text-slate-500">' +
-                (isSplit
-                  ? "Have the payer scan this " + (stepNumber === 1 ? "first" : stepNumber === total ? "last" : "next") +
-                    " QR code for " + escapeHtml(formatINR(payment.paise)) + "."
-                  : "Have the payer scan this QR code to pay " + escapeHtml(formatINR(payment.paise)) + ".") +
-              "</p>" +
+              '<p class="mt-2 text-xs leading-5 text-slate-500">' + hintText + "</p>" +
               '<button type="button"' +
                 ' class="download-button secondary-action mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"' +
                 ' data-index="' + index + '"' +
@@ -958,6 +1521,17 @@
                 '<i data-lucide="download" style="width:17px;height:17px" aria-hidden="true"></i> ' +
                 "Download PNG" +
               "</button>" +
+
+              /* ---- Payment checklist toggle ---- */
+              '<label class="paid-toggle' + (isPaid ? " is-paid" : "") + '" data-index="' + index + '">' +
+                '<input type="checkbox" class="paid-checkbox" data-index="' + index + '"' +
+                  (isPaid ? " checked" : "") +
+                  ' aria-label="Mark payment ' + stepNumber + ' as paid">' +
+                '<span class="paid-toggle-box" aria-hidden="true">' + TOGGLE_CHECK_SVG + "</span>" +
+                '<span class="paid-toggle-text">' +
+                  (isPaid ? "Payment " + stepNumber + " collected" : "Mark payment " + stepNumber + " as paid") +
+                "</span>" +
+              "</label>" +
             "</div>";
 
           el.qrGrid.appendChild(card);
@@ -993,6 +1567,111 @@
       }
 
       /* ------------------------------------------------------------------ *
+       * Collection progress + checklist
+       * ------------------------------------------------------------------ */
+
+      function buildChecklistPills() {
+        el.progressChecklist.innerHTML = state.payments
+          .map((_, index) =>
+            '<span class="checklist-pill" data-index="' + index + '">' +
+              PILL_CHECK_SVG +
+              "Payment " + (index + 1) +
+            "</span>"
+          )
+          .join("");
+      }
+
+      function renderProgress() {
+        const hasPayments = state.payments.length > 0 && Boolean(state.details);
+
+        el.progressCard.classList.toggle("hidden", !hasPayments);
+        if (!hasPayments) {
+          el.progressFill.style.width = "0%";
+          el.progressTrack.setAttribute("aria-valuenow", "0");
+          lastPercentShown = -1;
+          return;
+        }
+
+        const totalPaise = state.details.amountPaise;
+        const totalCount = state.payments.length;
+
+        let collectedPaise = 0;
+        let doneCount = 0;
+
+        state.payments.forEach((payment, index) => {
+          if (state.completed[index]) {
+            collectedPaise += payment.paise;
+            doneCount += 1;
+          }
+        });
+
+        const percent = totalPaise > 0
+          ? Math.min(100, Math.round((collectedPaise / totalPaise) * 100))
+          : 0;
+        const isComplete = totalCount > 0 && doneCount === totalCount;
+
+        // Values
+        el.progressAmount.textContent = formatINR(collectedPaise);
+        el.progressTotal.textContent = formatINR(totalPaise);
+        el.progressPercent.textContent = percent + "%";
+
+        el.progressCount.textContent = isComplete
+          ? "All " + totalCount + " payments collected 🎉"
+          : doneCount + " of " + totalCount + " payments completed";
+
+        // Bar
+        el.progressFill.style.width = percent + "%";
+        el.progressTrack.setAttribute("aria-valuenow", String(percent));
+        el.progressTrack.setAttribute(
+          "aria-valuetext",
+          formatINR(collectedPaise) + " of " + formatINR(totalPaise) + " collected, " + percent + "%"
+        );
+
+        el.progressCard.classList.toggle("is-complete", isComplete);
+        el.progressClear.classList.toggle("hidden", doneCount === 0);
+
+        // Checklist pills
+        if (el.progressChecklist.childElementCount !== totalCount) {
+          buildChecklistPills();
+        }
+        el.progressChecklist.querySelectorAll(".checklist-pill").forEach((pill, index) => {
+          pill.classList.toggle("is-done", Boolean(state.completed[index]));
+        });
+
+        // Pop the percentage only when it actually changes
+        if (percent !== lastPercentShown) {
+          el.progressPercent.classList.remove("pop-in");
+          void el.progressPercent.offsetWidth;
+          el.progressPercent.classList.add("pop-in");
+          lastPercentShown = percent;
+        }
+      }
+
+      /** Update a single card's paid visuals without a full re-render. */
+      function paintCardPaidState(box) {
+        const index = Number(box.dataset.index);
+        const checked = box.checked;
+
+        const card = box.closest(".qr-card");
+        const toggle = box.closest(".paid-toggle");
+        const text = toggle ? toggle.querySelector(".paid-toggle-text") : null;
+
+        if (card) card.classList.toggle("is-complete", checked);
+        if (toggle) toggle.classList.toggle("is-paid", checked);
+        if (text) {
+          text.textContent = checked
+            ? "Payment " + (index + 1) + " collected"
+            : "Mark payment " + (index + 1) + " as paid";
+        }
+
+        if (checked && card) {
+          card.classList.remove("just-checked");
+          void card.offsetWidth;
+          card.classList.add("just-checked");
+        }
+      }
+
+      /* ------------------------------------------------------------------ *
        * Summary
        * ------------------------------------------------------------------ */
 
@@ -1001,7 +1680,12 @@
 
         el.summaryEmpty.classList.toggle("hidden", hasPayments);
         el.summaryContent.classList.toggle("hidden", !hasPayments);
-        if (!hasPayments) return [];
+
+        if (!hasPayments) {
+          renderProgress();
+          updateScrollButton();
+          return [];
+        }
 
         const { details, payments } = state;
         const count = payments.length;
@@ -1030,7 +1714,10 @@
           }
         }
 
-        return renderQRCodes();
+        const failures = renderQRCodes();
+        renderProgress();
+        updateScrollButton();
+        return failures;
       }
 
       /* ------------------------------------------------------------------ *
@@ -1074,7 +1761,6 @@
         ctx.fillRect(0, 0, width, 8);
 
         // ---- Brand row (top-left) ----
-        // Small rounded gradient badge with the collect-smart mark.
         const badgeX = pad;
         const badgeY = 26;
         const badgeSize = 26;
@@ -1084,7 +1770,6 @@
         badgeGrad.addColorStop(1, "#4725b3");
         ctx.fillStyle = badgeGrad;
 
-        // Rounded-rect path for the badge
         const r = 8;
         ctx.beginPath();
         ctx.moveTo(badgeX + r, badgeY);
@@ -1095,20 +1780,16 @@
         ctx.closePath();
         ctx.fill();
 
-        // QR-like glyph inside the badge: three "finder" squares
-        const g = 7;                       // padding from badge edge
-        const finder = 5;                  // size of each finder square
-        const inner = 2;                   // hollow center size
-        const gap = 2;                     // gap between finder squares
+        const finder = 5;
+        const inner = 2;
+        const gap = 2;
         const blockSize = finder * 2 + gap;
         const gx = badgeX + (badgeSize - blockSize) / 2;
         const gy = badgeY + (badgeSize - blockSize) / 2;
 
         const drawFinder = (x, y) => {
-          // outer white square
           ctx.fillStyle = "#ffffff";
           ctx.fillRect(x, y, finder, finder);
-          // hollow (gradient-colored) center
           ctx.fillStyle = "rgba(71, 37, 179, 1)";
           ctx.fillRect(x + (finder - inner) / 2, y + (finder - inner) / 2, inner, inner);
         };
@@ -1117,14 +1798,12 @@
         drawFinder(gx + finder + gap, gy);
         drawFinder(gx, gy + finder + gap);
 
-        // "COLLECT SMARTER" wordmark to the right of the badge
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#5b35cc";
         ctx.font = "700 13px 'Work Sans', Arial, sans-serif";
         ctx.fillText("COLLECT SMARTER", badgeX + badgeSize + 12, badgeY + badgeSize / 2 + 1);
 
-        // Reset alignment for the rest of the drawing
         ctx.textAlign = "center";
         ctx.textBaseline = "alphabetic";
 
@@ -1156,14 +1835,12 @@
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(pad, qrTop, qrSize, qrSize);
 
-        // Source can be a <canvas> or an <img>.
         if (source.tagName === "IMG") {
           ctx.drawImage(source, pad, qrTop, qrSize, qrSize);
         } else {
           ctx.drawImage(source, 0, 0, source.width, source.height, pad, qrTop, qrSize, qrSize);
         }
 
-        // Thin frame around the QR
         ctx.strokeStyle = "#e6e3ed";
         ctx.lineWidth = 1;
         ctx.strokeRect(pad + 0.5, qrTop + 0.5, qrSize - 1, qrSize - 1);
@@ -1214,9 +1891,38 @@
         }
         el.summaryStatus.textContent = "";
 
-        const fileName =
-          "upi-payment-" + (index + 1) + "-" +
-          amountForUpi(state.payments[index].paise) + ".png";
+        const { details, payments } = state;
+        const total = payments.length;
+        const isSplit = total > 1;
+
+        // ₹1999.00 -> "1999" | ₹1999.50 -> "1999.50"
+        const rupees = payments[index].paise / 100;
+        const amountLabel = Number.isInteger(rupees)
+          ? String(rupees)
+          : rupees.toFixed(2).replace(/\.?0+$/, "");
+
+        const parts = ["COLLECT SMARTER", "upi"];
+
+        // who is collecting (first token of the name keeps it short)
+        const nameSlug = slugify(details.name.split(/\s+/)[0], 18);
+        if (nameSlug) parts.push(nameSlug);
+
+        // amount
+        parts.push("Rs" + amountLabel);
+
+        // step marker only when there's more than one QR
+        if (isSplit) parts.push("part" + String(index + 1).padStart(2, "0") + "of" + total);
+
+        // optional note
+        if (details.note) {
+          const noteSlug = slugify(details.note, 24);
+          if (noteSlug) parts.push(noteSlug);
+        }
+
+        // date stamp so repeat batches never collide
+        parts.push(fileStamp());
+
+        const fileName = parts.join("_") + ".png";
 
         const trigger = (href) => {
           const link = document.createElement("a");
@@ -1230,7 +1936,6 @@
         try {
           trigger(canvas.toDataURL("image/png"));
         } catch (error) {
-          // Canvas tainted (rare) — fall back to the plain QR image.
           const dataUrl = qrDataUrl(index);
           if (!dataUrl) {
             el.summaryStatus.textContent = "This QR image is not available for download. Please regenerate it.";
@@ -1240,48 +1945,97 @@
         }
       }
 
-      function buildPrintArea() {
-        const { details, payments } = state;
-        const total = payments.length;
+function buildPrintArea() {
+  const { details, payments } = state;
+  const total = payments.length;
+  const isSplit = total > 1;
+  const printedOn = new Date();
 
-        const cards = payments.map((payment, index) => {
-          const dataUrl = qrDataUrl(index);
-          return (
-            '<article class="print-card">' +
-              "<h2>Payment " + (index + 1) + " of " + total + "</h2>" +
-              '<p class="print-amount">' + escapeHtml(formatINR(payment.paise)) + "</p>" +
-              (dataUrl
-                ? '<img src="' + dataUrl + '" alt="UPI QR code for payment ' + (index + 1) + '">'
-                : "") +
-              "<p><strong>UPI ID:</strong> " + escapeHtml(details.upi) + "</p>" +
-              "<p><strong>Account:</strong> " + escapeHtml(details.name) + "</p>" +
-            "</article>"
-          );
-        }).join("");
+  const cards = payments.map((payment, index) => {
+    const dataUrl = qrDataUrl(index);
+    const stepNumber = index + 1;
 
-        el.printArea.innerHTML =
-          '<div class="print-head">' +
-            "<h1>UPI Payment QR Codes</h1>" +
-            "<p><strong>Account Holder:</strong> " + escapeHtml(details.name) + "</p>" +
-            "<p><strong>Total to Collect:</strong> " + escapeHtml(formatINR(details.amountPaise)) +
-              " &nbsp; • &nbsp; " + total + " QR code(s)</p>" +
-            (details.note ? "<p><strong>Payment Note:</strong> " + escapeHtml(details.note) + "</p>" : "") +
-          "</div>" +
-          '<div class="print-grid">' + cards + "</div>";
-      }
+    const hint = isSplit
+      ? "Payment " + stepNumber + " of " + total + " — scan this " +
+        (stepNumber === 1 ? "first" : stepNumber === total ? "last" : "next")
+      : "Full payment in one scan";
 
-      function printAll() {
-        if (!state.payments.length) return;
+    return (
+      '<article class="print-card">' +
+        '<div class="step-badge">' +
+          (isSplit ? "Step " + stepNumber + " of " + total : "UPI PAYMENT") +
+        "</div>" +
+        '<p class="print-amount">' + escapeHtml(formatINR(payment.paise)) + "</p>" +
+        (dataUrl
+          ? '<img src="' + dataUrl + '" alt="UPI QR code for payment ' + stepNumber + '">'
+          : '<p class="qr-note" style="color:#b91c3c">QR image not available</p>') +
+        '<p class="qr-note">' + escapeHtml(hint) + "</p>" +
+        '<div class="divider"></div>' +
+        '<p class="upi-line">' + escapeHtml(details.upi) + "</p>" +
+        '<p class="account-line">' + escapeHtml(details.name) + "</p>" +
+        (details.note
+          ? '<p class="qr-note" style="margin-top:6px"><em>"' + escapeHtml(details.note) + '"</em></p>'
+          : "") +
+      "</article>"
+    );
+  }).join("");
 
-        buildPrintArea();
+  const printedOnText =
+    String(printedOn.getDate()).padStart(2, "0") + "-" +
+    String(printedOn.getMonth() + 1).padStart(2, "0") + "-" +
+    printedOn.getFullYear() + " " +
+    String(printedOn.getHours()).padStart(2, "0") + ":" +
+    String(printedOn.getMinutes()).padStart(2, "0");
 
-        const images = Array.from(el.printArea.querySelectorAll("img"));
-        const ready = images.map((img) =>
-          typeof img.decode === "function" ? img.decode().catch(() => {}) : Promise.resolve()
-        );
+  el.printArea.innerHTML =
+    '<header class="print-head">' +
+      '<div class="brand-row">' +
+        '<span class="brand-badge">QR</span>' +
+        '<span class="brand-text">Collect Smarter</span>' +
+      "</div>" +
+      "<h1>UPI Payment QR Codes</h1>" +
+      '<div class="meta-grid">' +
+        "<p><strong>Account Holder:</strong> " + escapeHtml(details.name) + "</p>" +
+        "<p><strong>UPI ID:</strong> " + escapeHtml(details.upi) + "</p>" +
+        "<p><strong>Total to Collect:</strong> " + escapeHtml(formatINR(details.amountPaise)) + "</p>" +
+        "<p><strong>QR Codes:</strong> " + total + (total === 1 ? " code" : " codes") + "</p>" +
+        (details.note
+          ? "<p><strong>Note:</strong> " + escapeHtml(details.note) + "</p>"
+          : "") +
+        "<p><strong>Printed on:</strong> " + escapeHtml(printedOnText) + "</p>" +
+      "</div>" +
+    "</header>" +
+    '<div class="print-grid">' + cards + "</div>" +
+    '<footer class="print-foot">' +
+      "<p><strong>Important:</strong> Each QR code is valid for a single payment. " +
+      "Confirm the amount on the payer's screen before they enter their UPI PIN.</p>" +
+      "<p style='margin-top:4px'>Generated by Collect Smarter · UPI QR Code Generator</p>" +
+      "<p style='margin-top:4px'>Developed By ~ Shankar Prasad Pyke </p>" +
+    "</footer>";
+}
 
-        Promise.all(ready).then(() => window.print());
-      }
+function printAll() {
+  if (!state.payments.length) return;
+
+  buildPrintArea();
+
+  // Give the printed PDF a meaningful filename
+  const originalTitle = document.title;
+  const firstWord = state.details.name.split(/\s+/)[0] || "payment";
+  const printedOn = fileStamp(); // reuse your dd-mm-yyyy_hhmm helper
+  document.title = "UPI-QR_" + firstWord + "_" + printedOn;
+
+  const images = Array.from(el.printArea.querySelectorAll("img"));
+  const ready = images.map((img) =>
+    typeof img.decode === "function" ? img.decode().catch(() => {}) : Promise.resolve()
+  );
+
+  Promise.all(ready).then(() => {
+    window.print();
+    // Restore title after the dialog closes
+    setTimeout(() => { document.title = originalTitle; }, 0);
+  });
+}
 
       /* ------------------------------------------------------------------ *
        * Reset
@@ -1295,16 +2049,18 @@
 
         state.payments = [];
         state.details = null;
+        state.completed = [];
+        lastPercentShown = -1;
 
         el.qrGrid.innerHTML = "";
         el.printArea.innerHTML = "";
         el.amountPreview.textContent = "";
         el.splitPreview.classList.add("hidden");
         el.splitPreviewText.textContent = "";
+        el.progressChecklist.innerHTML = "";
 
         renderSummary();
         switchTab("details");
-        el.upi.focus();
       }
 
       /* ------------------------------------------------------------------ *
@@ -1387,6 +2143,8 @@
             paise,
             uri: buildUpiUri(result.details, paise)
           }));
+          state.completed = new Array(state.payments.length).fill(false);
+          lastPercentShown = -1;
 
           const failures = renderSummary();
 
@@ -1411,6 +2169,7 @@
         } catch (error) {
           state.payments = [];
           state.details = null;
+          state.completed = [];
           el.qrGrid.innerHTML = "";
           renderSummary();
           setStatus(
@@ -1423,9 +2182,51 @@
         }
       });
 
-      document.getElementById("reset-button").addEventListener("click", resetApp);
+      document.getElementById("reset-button").addEventListener("click", () => {
+        const hasData =
+          el.upi.value.trim() ||
+          el.name.value.trim() ||
+          el.amount.value.trim() ||
+          el.note.value.trim() ||
+          state.payments.length > 0 ||
+          state.details !== null;
+
+        if (!hasData) return;   // nothing to reset — no-op
+        openConfirmModal();
+      });
       document.getElementById("back-button").addEventListener("click", () => switchTab("details"));
       document.getElementById("print-button").addEventListener("click", printAll);
+
+      /* ------------------------------------------------------------------ *
+       * Checklist interactions
+       * ------------------------------------------------------------------ */
+
+      el.qrGrid.addEventListener("change", (event) => {
+        const box = event.target.closest(".paid-checkbox");
+        if (!box) return;
+
+        const index = Number(box.dataset.index);
+        if (!Number.isInteger(index) || index < 0 || index >= state.payments.length) return;
+
+        state.completed[index] = box.checked;
+        paintCardPaidState(box);
+        renderProgress();
+      });
+
+      if (el.progressClear) {
+        el.progressClear.addEventListener("click", () => {
+          if (!state.payments.length) return;
+
+          state.completed = new Array(state.payments.length).fill(false);
+
+          el.qrGrid.querySelectorAll(".paid-checkbox").forEach((box) => {
+            box.checked = false;
+            paintCardPaidState(box);
+          });
+
+          renderProgress();
+        });
+      }
 
       /* ------------------------------------------------------------------ *
        * Info modal
@@ -1441,7 +2242,6 @@
         infoModal.classList.add("is-open");
         infoModal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
-        // Focus the close button so keyboard users land inside the dialog.
         window.requestAnimationFrame(() => infoModalClose.focus());
       }
 
@@ -1458,12 +2258,10 @@
       if (infoButton) infoButton.addEventListener("click", openInfoModal);
       if (infoModalClose) infoModalClose.addEventListener("click", closeInfoModal);
 
-      // Click on the backdrop (but not inside the panel) closes the modal.
       infoModal.addEventListener("click", (event) => {
         if (event.target === infoModal) closeInfoModal();
       });
 
-      // Escape closes; Tab is trapped inside the dialog.
       infoModal.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           event.preventDefault();
@@ -1473,6 +2271,82 @@
         if (event.key !== "Tab") return;
 
         const focusables = infoModal.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+
+      /* ------------------------------------------------------------------ *
+       * Confirm reset modal
+       * ------------------------------------------------------------------ */
+
+      let lastFocusedBeforeConfirm = null;
+
+      function openConfirmModal() {
+        lastFocusedBeforeConfirm = document.activeElement;
+        confirmModal.classList.add("is-open");
+        confirmModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        window.requestAnimationFrame(() => confirmCancelBtn.focus());
+      }
+
+      function closeConfirmModal() {
+        confirmModal.classList.remove("is-open");
+        confirmModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+        if (lastFocusedBeforeConfirm && typeof lastFocusedBeforeConfirm.focus === "function") {
+          lastFocusedBeforeConfirm.focus();
+        }
+        lastFocusedBeforeConfirm = null;
+      }
+
+      confirmResetBtn.addEventListener("click", () => {
+        const trigger = lastFocusedBeforeConfirm;
+        confirmModal.classList.remove("is-open");
+
+        // Wait for the fade-out to finish before mutating the page.
+        const finish = () => {
+          confirmModal.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("modal-open");
+          resetApp();
+          if (trigger && typeof trigger.focus === "function") trigger.focus();
+          lastFocusedBeforeConfirm = null;
+        };
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          finish();
+        } else {
+          setTimeout(finish, 300); // matches .28s transition
+        }
+      });
+
+      confirmCancelBtn.addEventListener("click", closeConfirmModal);
+
+      confirmModal.addEventListener("click", (event) => {
+        if (event.target === confirmModal) closeConfirmModal();
+      });
+
+      confirmModal.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeConfirmModal();
+          return;
+        }
+        if (event.key !== "Tab") return;
+
+        const focusables = confirmModal.querySelectorAll(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
         if (!focusables.length) return;
@@ -1504,10 +2378,8 @@
       function sanitizeAmountInput() {
         const original = el.amount.value;
 
-        // Strip anything that isn't a digit or a dot
         let cleaned = original.replace(/[^\d.]/g, "");
 
-        // Keep only the first dot; remove any subsequent ones
         const firstDot = cleaned.indexOf(".");
         if (firstDot !== -1) {
           cleaned =
@@ -1515,17 +2387,14 @@
             cleaned.slice(firstDot + 1).replace(/\./g, "");
         }
 
-        // Trim to at most 2 decimal places
         const dotIndex = cleaned.indexOf(".");
         if (dotIndex !== -1) {
           cleaned = cleaned.slice(0, dotIndex + 3);
         }
 
-        // Prevent leading zeros like "007" (keep a single "0" before the dot)
         cleaned = cleaned.replace(/^0+(?=\d)/, "");
 
         if (cleaned !== original) {
-          // Preserve caret position as best we can
           const caret = el.amount.selectionStart;
           const removed = original.length - cleaned.length;
           el.amount.value = cleaned;
@@ -1539,7 +2408,6 @@
         updateAmountPreview();
       });
 
-      // Also catch paste events so pasted text gets sanitized too
       el.amount.addEventListener("paste", (event) => {
         event.preventDefault();
         const pasted = (event.clipboardData || window.clipboardData).getData("text");
@@ -1551,25 +2419,19 @@
         updateAmountPreview();
       });
 
-      // Block keys that can't be part of a positive decimal amount
       el.amount.addEventListener("keydown", (event) => {
-        // Allow navigation & control keys
         const allowedKeys = [
           "Backspace", "Delete", "Tab", "Escape", "Enter",
           "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"
         ];
         if (allowedKeys.includes(event.key)) return;
 
-        // Allow Ctrl/Cmd combos (copy, paste, select all, etc.)
         if (event.ctrlKey || event.metaKey) return;
 
-        // Allow digits
         if (/^\d$/.test(event.key)) return;
 
-        // Allow a single dot (only if there isn't already one)
         if (event.key === "." && !el.amount.value.includes(".")) return;
 
-        // Everything else is blocked
         event.preventDefault();
       });
 
@@ -1594,6 +2456,74 @@
       window.addEventListener("afterprint", () => {
         el.printArea.innerHTML = "";
       });
+
+            /* ------------------------------------------------------------------ *
+       * Scroll-to-QR floating button
+       * ------------------------------------------------------------------ */
+
+      const scrollToQrBtn = document.getElementById("scroll-to-qr");
+
+      // How far (px) the user must scroll before the button appears
+      const SCROLL_TRIGGER = 320;
+
+      /** Is the Payment Summary tab currently visible? */
+      function isSummaryTabActive() {
+        return !el.summaryPanel.classList.contains("hidden");
+      }
+
+      /** Show / hide the button based on tab + scroll position. */
+      function updateScrollButton() {
+        if (!scrollToQrBtn) return;
+
+        // Only show on the Payment Summary tab
+        if (!isSummaryTabActive()) {
+          scrollToQrBtn.classList.remove("is-visible");
+          return;
+        }
+
+        // If the progress card isn't there yet, fall back to a fixed threshold
+        const card = el.progressCard;
+        let shouldShow;
+
+        if (card && !card.classList.contains("hidden")) {
+          // Show only after the progress card has scrolled past the top of the viewport
+          const cardBottom = card.getBoundingClientRect().bottom;
+          shouldShow = cardBottom < 0;
+        } else {
+          // No progress card (empty summary) — fall back to scroll distance
+          shouldShow = window.scrollY > SCROLL_TRIGGER;
+        }
+
+        scrollToQrBtn.classList.toggle("is-visible", shouldShow);
+      }
+
+      /** Scroll smoothly to the "Collection Progress" card. */
+      function scrollToQrSection() {
+        // Prefer the actual progress card; fall back to the heading, then the grid.
+        const target = el.progressCard || el.qrGrid;
+        if (!target || target.classList.contains("hidden")) {
+          // Progress card not available — fall back to the QR grid
+          el.qrGrid.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+
+        const top = target.getBoundingClientRect().top + window.scrollY - 20;
+
+        window.scrollTo({
+          top: Math.max(0, top),
+          behavior: "smooth"
+        });
+      }
+
+      if (scrollToQrBtn) {
+        scrollToQrBtn.addEventListener("click", scrollToQrSection);
+      }
+
+      // Recompute on scroll (passive = no jank)
+      window.addEventListener("scroll", updateScrollButton, { passive: true });
+
+      // Recompute on resize (rotation, window resize)
+      window.addEventListener("resize", updateScrollButton);
 
       /* ------------------------------------------------------------------ *
        * Init
