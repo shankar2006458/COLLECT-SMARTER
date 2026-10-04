@@ -1,0 +1,2022 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment History · Collect Smarter</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" defer></script>
+
+  <style>
+    :root {
+      --ink: #1f1b33;
+      --muted: #6f6a80;
+      --line: #e6e3ed;
+      --surface: #ffffff;
+      --canvas: #f7f6fa;
+      --primary: #5b35cc;
+      --primary-dark: #4725b3;
+      --soft-primary: #f1edff;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--canvas); }
+
+    body {
+      font-family: "Work Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(91, 53, 204, 0.10), transparent 60%),
+        radial-gradient(1000px 500px at 100% 0%, rgba(91, 53, 204, 0.08), transparent 55%),
+        var(--canvas);
+      background-attachment: fixed;
+    }
+
+    button, input { font: inherit; }
+
+    button:focus-visible,
+    input:focus-visible,
+    a:focus-visible {
+      outline: 3px solid rgba(91, 53, 204, .25);
+      outline-offset: 2px;
+    }
+
+    .field-input {
+      border: 1px solid #dcd8e5;
+      background: #fff;
+      transition: border .2s ease, box-shadow .2s ease;
+    }
+    .field-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(91, 53, 204, .10);
+      outline: none;
+    }
+    .field-input.is-invalid { border-color: #d43f5e; }
+
+    .secondary-action {
+      border: 1px solid #dcd8e5;
+      background: #fff;
+      transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .secondary-action:hover { background: #f7f5fc; border-color: #c7bfdc; }
+
+    .primary-action {
+      background: var(--primary);
+      transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .primary-action:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 12px 24px rgba(91, 53, 204, .22);
+      transform: translateY(-1px);
+    }
+
+    .danger-action {
+      background: #dc2558;
+      transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .danger-action:hover {
+      background: #be1948;
+      box-shadow: 0 12px 24px rgba(220, 38, 88, .22);
+      transform: translateY(-1px);
+    }
+
+    /* ---------- Filter chips ---------- */
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: .5rem 1.05rem;
+      border: 1px solid #dcd8e5;
+      border-radius: 9999px;
+      background: #fff;
+      color: #4a4355;
+      font-size: .8125rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .filter-chip:hover { background: #f7f5fc; border-color: #c7bfdc; }
+    .filter-chip.is-active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(91, 53, 204, .22);
+    }
+
+    /* ---------- History cards ---------- */
+    .history-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: #fff;
+      padding: 1.15rem;
+      box-shadow: 0 1px 2px rgba(41, 28, 83, .04), 0 10px 26px rgba(41, 28, 83, .06);
+      transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+    }
+    .history-card:hover {
+      border-color: #d8d1ea;
+      box-shadow: 0 2px 4px rgba(41, 28, 83, .05), 0 18px 40px rgba(41, 28, 83, .11);
+      transform: translateY(-2px);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .3rem .62rem;
+      border-radius: 9999px;
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .status-pill.is-paid {
+      background: #e7f9f1;
+      color: #06794f;
+      border: 1px solid #a7e8c8;
+    }
+    .status-pill.is-pending {
+      background: #fff7e6;
+      color: #9a6200;
+      border: 1px solid #f5d99a;
+    }
+    .status-pill.is-partial {
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
+
+    .card-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .35rem;
+      min-height: 40px;
+      padding: .5rem .45rem;
+      border: 1px solid #dcd8e5;
+      border-radius: .7rem;
+      background: #fff;
+      color: #40394d;
+      font-size: .8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+    }
+    .card-action:hover { background: #f7f5fc; border-color: #c7bfdc; }
+    .card-action:active { transform: scale(.97); }
+    .card-action.is-view:hover { color: var(--primary); }
+    .card-action.is-reuse:hover { color: var(--primary); }
+    .card-action.is-delete { color: #b91c3c; border-color: #f3d3da; }
+    .card-action.is-delete:hover { background: #fff1f4; border-color: #eeb6c3; }
+
+    /* ---------- Modals ---------- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(23, 19, 30, 0.55);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .28s ease, visibility 0s linear .28s;
+      -webkit-backdrop-filter: blur(4px);
+              backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .28s ease, visibility 0s linear 0s;
+    }
+
+    /* Txn modal must stack above the view modal */
+    #txn-modal.modal-backdrop { z-index: 120; }
+
+    .modal-panel {
+      position: relative;
+      width: 100%;
+      max-width: 620px;
+      max-height: min(88vh, 780px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 1.25rem;
+      box-shadow: 0 30px 70px rgba(41, 28, 83, 0.32);
+      transform: translateY(18px) scale(0.97);
+      opacity: 0;
+      transition: transform .32s cubic-bezier(.22,.9,.3,1.2), opacity .28s ease;
+    }
+    .modal-backdrop.is-open .modal-panel {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    body.modal-open { overflow: hidden; }
+
+    .qr-mini canvas,
+    .qr-mini img {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      image-rendering: pixelated;
+    }
+
+    /* =========================================================
+       Payment cards (inside the view modal)
+       ========================================================= */
+
+    .payment-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .payment-card.is-paid { border-color: #c9ead9; }
+    .payment-card.is-pending { border-color: #f0e2c0; }
+    .payment-card:hover { box-shadow: 0 10px 24px rgba(41, 28, 83, .07); }
+
+    .payment-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #f0eef6;
+    }
+
+    .payment-step {
+      color: #5b35cc;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .payment-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .payment-qr {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .payment-qr .qr-mini {
+      width: 92px;
+      height: 92px;
+      flex: none;
+      border: 1px solid #eee9f6;
+      border-radius: 10px;
+      background: #fff;
+      padding: 6px;
+    }
+
+    .payment-info {
+      min-width: 0;
+      border-left: 1px solid #e6e3ed;
+      padding-left: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .payment-amount {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: #1f1b33;
+      overflow-wrap: anywhere;
+    }
+
+    .payment-details {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .payment-detail {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .payment-detail-label {
+      color: #8b869c;
+      flex: none;
+    }
+
+    .payment-detail-value {
+      color: #1f1b33;
+      font-weight: 700;
+      text-align: right;
+      min-width: 0;
+    }
+
+    .payment-txn {
+      overflow-wrap: anywhere;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .payment-message {
+      margin-top: 10px;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .payment-message.is-paid {
+      background: #e7f9f1;
+      color: #06794f;
+      border: 1px solid #a7e8c8;
+    }
+
+    .payment-message.is-pending {
+      background: #fff7e6;
+      color: #9a6200;
+      border: 1px solid #f5d99a;
+    }
+
+    /* ---------- Paid toggle (mirrors main page) ---------- */
+    .paid-toggle {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      width: 100%;
+      margin-top: 12px;
+      padding: .8rem .9rem;
+      border-radius: .9rem;
+      border: 1.5px solid #e6e3ed;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .28s ease, border-color .28s ease,
+                  transform .18s ease, box-shadow .28s ease;
+    }
+    .paid-toggle:hover { background: #faf9ff; border-color: #cfc6ea; }
+    .paid-toggle:active { transform: scale(.98); }
+    .paid-toggle:focus-visible {
+      outline: 3px solid rgba(91, 53, 204, .25);
+      outline-offset: 2px;
+    }
+    .paid-toggle.is-paid { background: #f2fdf8; border-color: #a7e8c8; }
+    .paid-toggle.is-paid:hover { background: #eafaf3; }
+
+    .paid-toggle-box {
+      position: relative;
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 9999px;
+      border: 2px solid #d5cfe6;
+      background: #fff;
+      transition: background .28s ease, border-color .28s ease,
+                  transform .38s cubic-bezier(.22, 1.5, .4, 1), box-shadow .28s ease;
+    }
+    .paid-toggle-box svg {
+      width: 14px;
+      height: 14px;
+      stroke: #fff;
+      opacity: 0;
+      transform: scale(.3) rotate(-28deg);
+      transition: opacity .2s ease, transform .38s cubic-bezier(.22, 1.5, .4, 1);
+    }
+    .paid-toggle.is-paid .paid-toggle-box {
+      background: #10b981;
+      border-color: #10b981;
+      transform: scale(1.07);
+      box-shadow: 0 6px 14px rgba(16, 185, 129, .34);
+    }
+    .paid-toggle.is-paid .paid-toggle-box svg {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    .paid-toggle-text {
+      font-size: .875rem;
+      font-weight: 600;
+      color: #4a4355;
+      transition: color .28s ease;
+    }
+    .paid-toggle.is-paid .paid-toggle-text { color: #06794f; }
+
+    .payment-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f0eef6;
+    }
+
+    .payment-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      min-height: 40px;
+      padding: .5rem .6rem;
+      border: 1px solid #dcd8e5;
+      border-radius: .7rem;
+      background: #fff;
+      color: #40394d;
+      font-size: .8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+    }
+    .payment-btn:hover {
+      background: #f7f5fc;
+      border-color: #c7bfdc;
+      color: var(--primary);
+    }
+    .payment-btn:active { transform: scale(.97); }
+    .payment-btn svg { flex: none; }
+    .payment-btn[disabled] {
+      opacity: .5;
+      cursor: not-allowed;
+      color: #8b869c;
+    }
+    .payment-btn[disabled]:hover {
+      background: #fff;
+      border-color: #dcd8e5;
+      color: #8b869c;
+    }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      padding: 10px 18px;
+      border-radius: 9999px;
+      background: #1f1b33;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 14px 32px rgba(23, 19, 30, .28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 16px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 480px) {
+      .payment-card { padding: 12px; }
+
+      .payment-row {
+        grid-template-columns: 78px minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .payment-qr .qr-mini {
+        width: 78px;
+        height: 78px;
+        padding: 5px;
+      }
+
+      .payment-info { padding-left: 12px; }
+
+      .payment-amount { font-size: 19px; }
+
+      .payment-detail { font-size: 11px; }
+
+      .payment-btn { font-size: .75rem; }
+
+      .paid-toggle-text { font-size: .8125rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+
+    <!-- ===== Top bar ===== -->
+    <header class="mb-6 flex flex-wrap items-center justify-between gap-3 sm:mb-8">
+      <div class="flex items-center gap-3">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl text-white"
+             style="background: linear-gradient(135deg, #6d4aff 0%, #4725b3 100%);"
+             aria-hidden="true">
+          <i data-lucide="qr-code" style="width:22px;height:22px"></i>
+        </div>
+        <span class="text-xs font-bold uppercase tracking-[0.14em]" style="color:#5b35cc;">
+          Collect Smarter
+        </span>
+      </div>
+
+      <a href="index.html"
+         class="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 py-2.5"
+         style="background:#ffffff; color:#40394d; text-decoration:none;"
+         aria-label="Back to the QR code generator">
+        <i data-lucide="arrow-left" style="width:18px;height:18px;color:#5b35cc" aria-hidden="true"></i>
+        <span style="color:#40394d; font-weight:600; font-size:14px;">Generator</span>
+      </a>
+    </header>
+
+    <!-- ===== Title ===== -->
+    <div class="mb-6">
+      <h1 class="font-extrabold tracking-tight"
+          style="color:#1f1b33; font-size: clamp(28px, 4vw, 40px); line-height:1.1; letter-spacing:-0.02em;">
+        Payment History
+      </h1>
+      <p class="mt-2 leading-7" style="color:#6f6a80; font-size:16px;">
+        View and manage your previous QR collections.
+      </p>
+    </div>
+
+    <!-- ===== Toolbar ===== -->
+    <div class="mb-5 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative flex-1">
+          <i data-lucide="search"
+             style="width:18px;height:18px;position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8b869c;pointer-events:none"
+             aria-hidden="true"></i>
+          <input id="search-input" type="search" class="field-input w-full rounded-xl py-3 pl-11 pr-4 text-base"
+                 placeholder="Search by name, UPI ID, note, amount or Txn ID..."
+                 aria-label="Search payment history"
+                 autocomplete="off" spellcheck="false">
+        </div>
+
+        <div id="filter-group" class="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0"
+             role="group" aria-label="Filter collections by status">
+          <button type="button" class="filter-chip is-active" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="filter-chip" data-filter="paid" aria-pressed="false">Paid</button>
+          <button type="button" class="filter-chip" data-filter="partial" aria-pressed="false">Partial</button>
+          <button type="button" class="filter-chip" data-filter="pending" aria-pressed="false">Pending</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Count row ===== -->
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <p id="history-count" class="text-sm font-bold" style="color:#1f1b33;" aria-live="polite">0 Collections</p>
+
+      <button id="clear-history" type="button"
+              class="hidden inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border px-3.5 py-2"
+              style="border-color:#f3d3da; background:#fff; color:#b91c3c;">
+        <i data-lucide="trash-2" style="width:15px;height:15px;color:#b91c3c" aria-hidden="true"></i>
+        <span style="color:#b91c3c; font-weight:700; font-size:12px;">Clear History</span>
+      </button>
+    </div>
+
+    <!-- ===== List ===== -->
+    <div id="history-list" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+
+    <!-- ===== Empty state ===== -->
+    <div id="empty-state" class="hidden rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-14 text-center">
+      <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-indigo-600 shadow-sm" aria-hidden="true">
+        <i data-lucide="history" style="width:26px;height:26px"></i>
+      </div>
+      <h2 id="empty-title" class="font-bold" style="color:#1f1b33; font-size:20px;">No payment history yet</h2>
+      <p id="empty-text" class="mx-auto mt-3 max-w-md leading-6" style="color:#6f6a80; font-size:15px;">
+        Generate UPI QR codes in the generator and they'll appear here automatically.
+      </p>
+      <a href="index.html"
+         class="primary-action mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5"
+         style="background:#5b35cc; color:#fff; text-decoration:none;">
+        <i data-lucide="plus" style="width:17px;height:17px;color:#fff" aria-hidden="true"></i>
+        <span style="color:#fff; font-weight:600; font-size:14px;">Create new QR codes</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== View modal ===== -->
+  <div id="view-modal" class="modal-backdrop" role="dialog" aria-modal="true"
+       aria-labelledby="view-modal-title" aria-hidden="true">
+    <div class="modal-panel" role="document">
+      <div class="flex items-start gap-3 border-b border-indigo-100 bg-indigo-50 px-5 py-4 sm:px-6">
+        <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-indigo-600 text-white" aria-hidden="true">
+          <i data-lucide="receipt" style="width:20px;height:20px"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="view-modal-title" class="font-bold" style="color:#29196b; font-weight:700; font-size:18px;">
+            Collection details
+          </h3>
+          <p id="view-modal-sub" class="mt-0.5 text-sm" style="color:#4826b0;"></p>
+        </div>
+        <button id="view-modal-close" type="button"
+                class="secondary-action flex h-9 w-9 flex-none items-center justify-center rounded-full"
+                aria-label="Close details">
+          <i data-lucide="x" style="width:18px;height:18px" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div id="view-modal-body" class="modal-body px-5 py-5 sm:px-6"></div>
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <button id="view-modal-close-2" type="button"
+                class="secondary-action inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5"
+                style="background:#fff; color:#40394d;">
+          <span style="color:#40394d; font-weight:600; font-size:14px;">Close</span>
+        </button>
+
+        <button id="view-modal-reuse" type="button" data-id=""
+                class="primary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5"
+                style="background:#5b35cc; color:#fff;">
+          <i data-lucide="refresh-cw" style="width:17px;height:17px;color:#fff" aria-hidden="true"></i>
+          <span style="color:#fff; font-weight:600; font-size:14px;">Reuse these details</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Confirm modal ===== -->
+  <div id="confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true"
+       aria-labelledby="confirm-title" aria-describedby="confirm-desc" aria-hidden="true">
+    <div class="modal-panel" role="document" style="max-width: 460px;">
+      <div class="flex items-start gap-3 border-b border-rose-100 bg-rose-50 px-5 py-4 sm:px-6">
+        <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-rose-600 text-white" aria-hidden="true">
+          <i data-lucide="alert-triangle" style="width:20px;height:20px"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="confirm-title" class="font-bold" style="color:#780f28; font-weight:700; font-size:18px;">
+            Are you sure?
+          </h3>
+          <p id="confirm-desc" class="mt-0.5 text-sm" style="color:#962846;"></p>
+        </div>
+      </div>
+
+      <div class="px-5 py-5 sm:px-6">
+        <p id="confirm-body" class="text-sm leading-6" style="color:#484258;"></p>
+      </div>
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <button id="confirm-cancel" type="button"
+                class="secondary-action inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-2.5"
+                style="background:#fff; color:#40394d;">
+          <span style="color:#40394d; font-weight:600; font-size:14px;">Cancel</span>
+        </button>
+
+        <button id="confirm-ok" type="button"
+                class="danger-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5"
+                style="background:#dc2558; color:#fff;">
+          <i data-lucide="trash-2" style="width:17px;height:17px;color:#fff" aria-hidden="true"></i>
+          <span id="confirm-ok-text" style="color:#fff; font-weight:600; font-size:14px;">Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Transaction ID modal ===== -->
+  <div id="txn-modal" class="modal-backdrop" role="dialog" aria-modal="true"
+       aria-labelledby="txn-modal-title" aria-hidden="true">
+    <div class="modal-panel" role="document" style="max-width: 480px;">
+      <div class="flex items-start gap-3 border-b border-indigo-100 bg-indigo-50 px-5 py-4 sm:px-6">
+        <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-indigo-600 text-white" aria-hidden="true">
+          <i data-lucide="receipt" style="width:20px;height:20px"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="txn-modal-title" class="font-bold"
+              style="color:#29196b; font-weight:700; font-size:18px;">
+            Confirm payment received
+          </h3>
+          <p id="txn-modal-desc" class="mt-0.5 text-sm" style="color:#4826b0;">
+            Enter the UPI transaction ID to mark this payment as collected.
+          </p>
+        </div>
+        <button id="txn-modal-close" type="button"
+                class="secondary-action flex h-9 w-9 flex-none items-center justify-center rounded-full"
+                aria-label="Close transaction ID dialog">
+          <i data-lucide="x" style="width:18px;height:18px" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="modal-body px-5 py-5 sm:px-6">
+        <div class="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wider"
+             style="color:#6f6a80; font-weight:600; font-size:11px; letter-spacing:.06rem;">
+            Payment
+          </p>
+          <p id="txn-modal-payment" class="mt-1 text-sm font-bold" style="color:#1f1b33;"></p>
+          <p id="txn-modal-amount" class="mt-0.5 text-lg font-bold" style="color:#5b35cc;"></p>
+        </div>
+
+        <label for="txn-id-input" class="mb-2 block text-sm font-semibold"
+               style="color:#302a40; font-weight:600; font-size:14px;">
+          Transaction ID / UTR <span class="text-rose-600">*</span>
+        </label>
+        <input id="txn-id-input" class="field-input w-full rounded-xl px-4 py-3.5 text-base"
+               type="text" autocomplete="off" spellcheck="false"
+               maxlength="40" placeholder="e.g. 4312XXXXXXXX or T1234567890"
+               aria-describedby="txn-id-help txn-id-error">
+        <p id="txn-id-help" class="mt-1.5 text-xs" style="color:#6f6a80;">
+          Find this in your UPI app's payment history (usually 12–24 characters).
+        </p>
+        <p id="txn-id-error" class="mt-1 text-sm font-medium text-rose-600" aria-live="polite"></p>
+      </div>
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <button id="txn-cancel" type="button"
+                class="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5"
+                style="background:#fff; color:#40394d;">
+          <span style="color:#40394d; font-weight:600; font-size:14px;">Cancel</span>
+        </button>
+
+        <button id="txn-confirm" type="button"
+                class="primary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5"
+                style="background:#5b35cc; color:#fff;">
+          <i data-lucide="check" style="width:17px;height:17px;color:#fff" aria-hidden="true"></i>
+          <span style="color:#fff; font-weight:600; font-size:14px;">Confirm Payment</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ---------------- Constants ---------------- */
+
+      const HISTORY_KEY = "collectSmarter:history";
+      const MAX_PAISE_PER_QR = 199900;
+      const UPDATE_THRESHOLD_MS = 60 * 1000;
+
+      const PAID_CHECK_SVG =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+      /* ---------------- Element cache ---------------- */
+
+      const els = {
+        list: document.getElementById("history-list"),
+        count: document.getElementById("history-count"),
+        search: document.getElementById("search-input"),
+        filters: document.getElementById("filter-group"),
+        clearAll: document.getElementById("clear-history"),
+        empty: document.getElementById("empty-state"),
+        emptyTitle: document.getElementById("empty-title"),
+        emptyText: document.getElementById("empty-text"),
+        toast: document.getElementById("toast")
+      };
+
+      const viewModal = document.getElementById("view-modal");
+      const viewBody = document.getElementById("view-modal-body");
+      const viewSub = document.getElementById("view-modal-sub");
+      const viewClose = document.getElementById("view-modal-close");
+      const viewClose2 = document.getElementById("view-modal-close-2");
+      const viewReuse = document.getElementById("view-modal-reuse");
+
+      const confirmModal = document.getElementById("confirm-modal");
+      const confirmTitle = document.getElementById("confirm-title");
+      const confirmDesc = document.getElementById("confirm-desc");
+      const confirmBody = document.getElementById("confirm-body");
+      const confirmOk = document.getElementById("confirm-ok");
+      const confirmOkText = document.getElementById("confirm-ok-text");
+      const confirmCancel = document.getElementById("confirm-cancel");
+
+      const txnModal = document.getElementById("txn-modal");
+      const txnModalClose = document.getElementById("txn-modal-close");
+      const txnCancel = document.getElementById("txn-cancel");
+      const txnConfirm = document.getElementById("txn-confirm");
+      const txnIdInput = document.getElementById("txn-id-input");
+      const txnIdError = document.getElementById("txn-id-error");
+      const txnModalPayment = document.getElementById("txn-modal-payment");
+      const txnModalAmount = document.getElementById("txn-modal-amount");
+
+      /* ---------------- State ---------------- */
+
+      let entries = [];
+      let filtered = [];
+      let activeFilter = "all";
+      let searchQuery = "";
+      let pendingAction = null;
+      let lastFocused = null;
+      let openModalEl = null;
+      let toastTimer = null;
+
+      let currentViewId = "";
+      let txnEntryId = null;
+      let txnPaymentIndex = -1;
+      let txnLastFocused = null;
+
+      /* ---------------- Utilities ---------------- */
+
+      const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch]);
+      }
+
+      function slugify(value, maxLen) {
+        const limit = typeof maxLen === "number" ? maxLen : 30;
+        return String(value == null ? "" : value)
+          .normalize("NFKD")
+          .replace(/[^\w\s.-]/g, "")
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^[-.]+|[-.]+$/g, "")
+          .slice(0, limit);
+      }
+
+      function formatINR(paise) {
+        const value = Number(paise) || 0;
+        return new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+          minimumFractionDigits: value % 100 === 0 ? 0 : 2,
+          maximumFractionDigits: 2
+        }).format(value / 100);
+      }
+
+      function formatDateTime(timestamp) {
+        const date = new Date(Number(timestamp) || 0);
+        if (isNaN(date.getTime()) || !timestamp) return "Unknown date";
+
+        const day = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        const time = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+        return day + " · " + time;
+      }
+
+      function buildUpiUri(details, paise) {
+        const params = new URLSearchParams({
+          pa: details.upi,
+          pn: details.name,
+          am: (Number(paise) / 100).toFixed(2),
+          cu: "INR"
+        });
+        if (details.note) params.append("tn", details.note);
+        return "upi://pay?" + params.toString();
+      }
+
+      /* ---------------- Toast ---------------- */
+
+      function showToast(message) {
+        const toast = els.toast;
+        if (!toast) return;
+
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => {
+          toast.classList.remove("is-visible");
+        }, 2200);
+      }
+
+      /* ---------------- Clipboard ---------------- */
+
+      function legacyCopy(text, onDone) {
+        try {
+          const area = document.createElement("textarea");
+          area.value = text;
+          area.setAttribute("readonly", "");
+          area.style.position = "fixed";
+          area.style.top = "-1000px";
+          area.style.left = "-1000px";
+          area.style.opacity = "0";
+          document.body.appendChild(area);
+          area.select();
+          area.setSelectionRange(0, area.value.length);
+          document.execCommand("copy");
+          area.remove();
+          onDone();
+        } catch (error) {
+          showToast("Could not copy — long-press to copy manually");
+        }
+      }
+
+      function copyText(text, successMessage) {
+        const done = () => showToast(successMessage || "Copied to clipboard");
+
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(done).catch(() => legacyCopy(text, done));
+        } else {
+          legacyCopy(text, done);
+        }
+      }
+
+      /* ---------------- Storage ---------------- */
+
+      function loadEntries() {
+        let raw = null;
+        try {
+          raw = localStorage.getItem(HISTORY_KEY);
+        } catch (error) {
+          raw = null;
+        }
+
+        if (!raw) {
+          entries = [];
+          return;
+        }
+
+        let parsed = null;
+        try {
+          parsed = JSON.parse(raw);
+        } catch (error) {
+          entries = [];
+          return;
+        }
+
+        if (!Array.isArray(parsed)) {
+          entries = [];
+          return;
+        }
+
+        entries = parsed
+          .filter((item) => item && item.details && Array.isArray(item.payments) && item.payments.length)
+          .map((item) => ({
+            id: String(item.id || ""),
+            createdAt: Number(item.createdAt) || 0,
+            updatedAt: Number(item.updatedAt) || Number(item.createdAt) || 0,
+            details: {
+              upi: String((item.details && item.details.upi) || ""),
+              name: String((item.details && item.details.name) || ""),
+              amountPaise: Number(item.details && item.details.amountPaise) || 0,
+              note: String((item.details && item.details.note) || "")
+            },
+            payments: item.payments.map((p) => ({ paise: Number(p && p.paise) || 0 })),
+            completed: Array.isArray(item.completed) ? item.completed.map(Boolean) : [],
+            txnIds: Array.isArray(item.txnIds) ? item.txnIds.map((t) => String(t || "")) : []
+          }))
+          .filter((item) => item.id && item.details.upi)
+          .sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
+      }
+
+      function saveEntries() {
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+          return true;
+        } catch (error) {
+          if (window.console && console.warn) {
+            console.warn("Could not save history — storage quota may be exceeded.");
+          }
+          return false;
+        }
+      }
+
+      function ensureEntryArrays(entry) {
+        const len = entry.payments.length;
+        if (!Array.isArray(entry.completed) || entry.completed.length < len) {
+          const next = new Array(len).fill(false);
+          for (let i = 0; i < entry.completed.length; i++) next[i] = entry.completed[i];
+          entry.completed = next;
+        }
+        if (!Array.isArray(entry.txnIds) || entry.txnIds.length < len) {
+          const next = new Array(len).fill("");
+          for (let i = 0; i < entry.txnIds.length; i++) next[i] = entry.txnIds[i];
+          entry.txnIds = next;
+        }
+      }
+
+      /* ---------------- Stats ---------------- */
+
+      function computeStats(entry) {
+        const payments = Array.isArray(entry.payments) ? entry.payments : [];
+        const total = payments.length;
+
+        let totalPaise = Number(entry.details && entry.details.amountPaise) || 0;
+        if (!totalPaise) {
+          totalPaise = payments.reduce((sum, p) => sum + (Number(p.paise) || 0), 0);
+        }
+
+        let collected = 0;
+        let done = 0;
+
+        payments.forEach((payment, index) => {
+          if (entry.completed && entry.completed[index]) {
+            collected += Number(payment.paise) || 0;
+            done += 1;
+          }
+        });
+
+        const isPaid = total > 0 && done === total;
+        const isPartial = !isPaid && done > 0;
+
+        return {
+          total: total,
+          totalPaise: totalPaise,
+          collected: collected,
+          done: done,
+          isPaid: isPaid,
+          isPartial: isPartial,
+          percent: totalPaise > 0 ? Math.min(100, Math.round((collected / totalPaise) * 100)) : 0
+        };
+      }
+
+      function statusFor(stats) {
+        if (stats.isPaid) return { cls: "is-paid", text: "Paid ✓" };
+        if (stats.isPartial) return { cls: "is-partial", text: "Partial" };
+        return { cls: "is-pending", text: "Pending" };
+      }
+
+      /* ---------------- Rendering ---------------- */
+
+      function tile(label, value, breakAll) {
+        return (
+          '<div class="min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">' +
+            '<p class="text-[10px] font-bold uppercase tracking-[0.1em]" style="color:#6f6a80;">' +
+              escapeHtml(label) +
+            "</p>" +
+            '<p class="mt-1 text-sm font-bold ' + (breakAll ? "break-all" : "break-words") + '" style="color:#1f1b33;">' +
+              escapeHtml(value) +
+            "</p>" +
+          "</div>"
+        );
+      }
+
+      function cardHtml(entry) {
+        const stats = computeStats(entry);
+        const status = statusFor(stats);
+
+        const qrWord = stats.total === 1 ? "QR code" : "QR codes";
+        const metaLine = status.cls === "is-paid"
+          ? stats.total + " " + qrWord + " • " + formatINR(stats.collected) + " collected"
+          : stats.total + " " + qrWord + " • " + formatINR(stats.collected) + " / " +
+            formatINR(stats.totalPaise) + " collected";
+
+        const barColor = stats.isPaid
+          ? "linear-gradient(90deg,#34d399,#10b981)"
+          : (stats.isPartial
+              ? "linear-gradient(90deg,#818cf8,#4f46e5)"
+              : "linear-gradient(90deg,#7c5cff,#5b35cc)");
+
+        const idAttr = escapeHtml(entry.id);
+
+        const wasUpdated = entry.updatedAt && entry.createdAt &&
+          (entry.updatedAt - entry.createdAt) > UPDATE_THRESHOLD_MS;
+        const dateLine = formatDateTime(entry.createdAt) + (wasUpdated ? " · updated" : "");
+
+        return (
+          '<article class="history-card" data-id="' + idAttr + '">' +
+            '<div class="flex items-start justify-between gap-3">' +
+              '<p class="text-2xl font-bold" style="color:#1f1b33;">' +
+                escapeHtml(formatINR(entry.details.amountPaise)) +
+              "</p>" +
+              '<span class="status-pill ' + status.cls + '">' +
+                status.text +
+              "</span>" +
+            "</div>" +
+
+            '<p class="mt-2 break-words text-sm font-semibold" style="color:#302a40;">' +
+              escapeHtml(entry.details.name || "—") +
+            "</p>" +
+            '<p class="break-all text-xs font-medium" style="color:#6f6a80;">' +
+              escapeHtml(entry.details.upi) +
+            "</p>" +
+
+            (entry.details.note
+              ? '<p class="mt-1.5 break-words text-xs italic" style="color:#5b35cc;">' +
+                  escapeHtml(entry.details.note) + "</p>"
+              : "") +
+
+            '<div class="mt-3 h-1.5 w-full overflow-hidden rounded-full" style="background:#efecf8;">' +
+              '<div class="h-full rounded-full" style="width:' + stats.percent + "%;background:" + barColor + ';"></div>' +
+            "</div>" +
+
+            '<p class="mt-3 text-xs font-medium" style="color:#4a4355;">' + escapeHtml(metaLine) + "</p>" +
+            '<p class="mt-0.5 text-xs" style="color:#8b869c;">' + escapeHtml(dateLine) + "</p>" +
+
+            '<div class="mt-4 grid grid-cols-3 gap-2 border-t pt-4" style="border-color:#f0eef6;">' +
+              '<button type="button" class="card-action is-view" data-action="view" data-id="' + idAttr + '" aria-label="View collection details">' +
+                '<i data-lucide="eye" style="width:15px;height:15px" aria-hidden="true"></i><span>View</span>' +
+              "</button>" +
+              '<button type="button" class="card-action is-reuse" data-action="reuse" data-id="' + idAttr + '" aria-label="Reuse these payment details">' +
+                '<i data-lucide="refresh-cw" style="width:15px;height:15px" aria-hidden="true"></i><span>Reuse</span>' +
+              "</button>" +
+              '<button type="button" class="card-action is-delete" data-action="delete" data-id="' + idAttr + '" aria-label="Delete this collection">' +
+                '<i data-lucide="trash-2" style="width:15px;height:15px" aria-hidden="true"></i><span>Delete</span>' +
+              "</button>" +
+            "</div>" +
+          "</article>"
+        );
+      }
+
+      function render() {
+        const query = searchQuery.trim().toLowerCase();
+
+        filtered = entries.filter((entry) => {
+          const stats = computeStats(entry);
+
+          if (activeFilter === "paid" && !stats.isPaid) return false;
+          if (activeFilter === "partial" && !stats.isPartial) return false;
+          if (activeFilter === "pending" && stats.isPaid) return false;
+          if (!query) return true;
+
+          const txns = Array.isArray(entry.txnIds) ? entry.txnIds.join(" ") : "";
+
+          const haystack = [
+            entry.details.name,
+            entry.details.upi,
+            entry.details.note,
+            formatINR(entry.details.amountPaise),
+            String(entry.details.amountPaise / 100),
+            txns
+          ].join(" ").toLowerCase();
+
+          return haystack.indexOf(query) !== -1;
+        });
+
+        if (!entries.length) {
+          els.count.textContent = "0 Collections";
+        } else if (filtered.length === entries.length) {
+          els.count.textContent = entries.length + (entries.length === 1 ? " Collection" : " Collections");
+        } else {
+          els.count.textContent = filtered.length + " of " + entries.length + " Collections";
+        }
+
+        els.clearAll.classList.toggle("hidden", entries.length === 0);
+
+        if (!filtered.length) {
+          els.list.innerHTML = "";
+
+          if (!entries.length) {
+            els.emptyTitle.textContent = "No payment history yet";
+            els.emptyText.textContent =
+              "Generate UPI QR codes in the generator and they'll appear here automatically.";
+          } else {
+            els.emptyTitle.textContent = "No matching collections";
+            els.emptyText.textContent =
+              "Try a different search term, or switch the filter back to All.";
+          }
+
+          els.empty.classList.remove("hidden");
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        els.empty.classList.add("hidden");
+        els.list.innerHTML = filtered.map(cardHtml).join("");
+
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      /* ---------------- Modal helpers ---------------- */
+
+      function trapFocus(container, event) {
+        if (event.key !== "Tab") return;
+
+        const focusables = container.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      function openModal(modal, focusTarget) {
+        lastFocused = document.activeElement;
+        openModalEl = modal;
+
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+
+        if (window.lucide) window.lucide.createIcons();
+
+        const target = focusTarget || modal.querySelector("button");
+        window.requestAnimationFrame(() => {
+          if (target && typeof target.focus === "function") target.focus();
+        });
+      }
+
+      function closeModal(modal) {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+
+        if (openModalEl === modal) openModalEl = null;
+        if (!document.querySelector(".modal-backdrop.is-open")) {
+          document.body.classList.remove("modal-open");
+        }
+
+        if (lastFocused && typeof lastFocused.focus === "function") {
+          lastFocused.focus();
+        }
+        lastFocused = null;
+      }
+
+      [viewModal, confirmModal].forEach((modal) => {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeModal(modal);
+        });
+
+        modal.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            // If the txn modal is open on top, let it handle Escape first.
+            if (txnModal && txnModal.classList.contains("is-open")) return;
+            event.preventDefault();
+            closeModal(modal);
+            return;
+          }
+          trapFocus(modal, event);
+        });
+      });
+
+      /* ---------------- Payment card HTML ---------------- */
+
+      function paymentCardHtml(entry, index) {
+        const isPaid = Boolean(entry.completed && entry.completed[index]);
+        const txn = entry.txnIds && entry.txnIds[index] ? String(entry.txnIds[index]) : "";
+        const total = entry.payments.length;
+        const isSplit = total > 1;
+        const stateCls = isPaid ? "is-paid" : "is-pending";
+        const stepNumber = index + 1;
+
+        const toggleLabel = isPaid
+          ? (isSplit ? "Payment " + stepNumber + " received" : "Payment received — tap to undo")
+          : (isSplit ? "Mark payment " + stepNumber + " as paid" : "Mark as paid");
+
+        return (
+          '<article class="payment-card ' + stateCls + '">' +
+
+            /* Head: step + status pill */
+            '<div class="payment-card-head">' +
+              '<p class="payment-step">' +
+                (isSplit ? "Payment " + stepNumber + " of " + total : "UPI Payment") +
+              '</p>' +
+              '<span class="status-pill ' + stateCls + '">' +
+                (isPaid ? "Paid ✓" : "Pending") +
+              '</span>' +
+            '</div>' +
+
+            /* Body: QR + info */
+            '<div class="payment-row">' +
+              '<div class="payment-qr">' +
+                '<div class="qr-mini" id="view-qr-' + index + '"></div>' +
+              '</div>' +
+
+              '<div class="payment-info">' +
+                '<p class="payment-amount">' +
+                  escapeHtml(formatINR(entry.payments[index].paise)) +
+                '</p>' +
+
+                (txn
+                  ? '<div class="payment-details">' +
+                      '<div class="payment-detail">' +
+                        '<span class="payment-detail-label">Txn ID:</span>' +
+                        '<span class="payment-detail-value payment-txn" title="' + escapeHtml(txn) + '">' +
+                          escapeHtml(txn) +
+                        '</span>' +
+                      '</div>' +
+                    '</div>'
+                  : "") +
+
+                '<div class="payment-message ' + stateCls + '">' +
+                  (isPaid
+                    ? "✓ Payment successfully received"
+                    : "Scan this QR code to complete payment") +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+
+            /* Paid toggle */
+            '<button type="button" class="paid-toggle' + (isPaid ? " is-paid" : "") + '" ' +
+              'data-mark-paid="' + index + '" ' +
+              'aria-pressed="' + isPaid + '" ' +
+              'aria-label="' + escapeHtml(toggleLabel) + '">' +
+              '<span class="paid-toggle-box" aria-hidden="true">' + PAID_CHECK_SVG + '</span>' +
+              '<span class="paid-toggle-text">' + escapeHtml(toggleLabel) + '</span>' +
+            '</button>' +
+
+            /* Actions */
+            '<div class="payment-actions">' +
+              '<button type="button" class="payment-btn" data-view-download="' + index + '" ' +
+                'aria-label="Download QR code ' + stepNumber + ' as PNG">' +
+                '<i data-lucide="download" style="width:15px;height:15px" aria-hidden="true"></i>' +
+                '<span>Download</span>' +
+              '</button>' +
+              '<button type="button" class="payment-btn" data-copy-txn="' + index + '" ' +
+                'aria-label="Copy transaction ID for QR code ' + stepNumber + '"' +
+                (txn ? '' : ' disabled') + '>' +
+                '<i data-lucide="copy" style="width:15px;height:15px" aria-hidden="true"></i>' +
+                '<span>Copy Txn ID</span>' +
+              '</button>' +
+            '</div>' +
+
+          '</article>'
+        );
+      }
+
+      /* ---------------- View modal body ---------------- */
+
+      function renderViewModalContent(entry) {
+        const stats = computeStats(entry);
+        const total = stats.total;
+        const status = statusFor(stats);
+
+        viewSub.textContent = formatDateTime(entry.createdAt) + " · " +
+          (stats.isPaid
+            ? "Fully collected"
+            : formatINR(stats.collected) + " of " + formatINR(stats.totalPaise) + " collected");
+
+        const tiles =
+          '<div class="grid grid-cols-2 gap-3">' +
+            tile("Total", formatINR(entry.details.amountPaise)) +
+            tile("Collected", formatINR(stats.collected)) +
+            tile("Account holder", entry.details.name || "—") +
+            tile("UPI ID", entry.details.upi, true) +
+          "</div>";
+
+        const noteBlock = entry.details.note
+          ? '<p class="mt-3 break-words rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm" style="color:#4826b0;">' +
+              "<strong>Note:</strong> " + escapeHtml(entry.details.note) + "</p>"
+          : "";
+
+        const overallStatus =
+          '<p class="mt-3"><span class="status-pill ' + status.cls + '">' + status.text + "</span></p>";
+
+        const rows = entry.payments
+          .map((_, index) => paymentCardHtml(entry, index))
+          .join("");
+
+        viewBody.innerHTML =
+          tiles +
+          overallStatus +
+          noteBlock +
+          '<h4 class="mb-3 mt-5 text-sm font-bold" style="color:#1f1b33;">QR codes (' + total + ")</h4>" +
+          '<div class="space-y-3">' + rows + "</div>";
+
+        if (window.lucide) window.lucide.createIcons();
+
+        /* Render QR codes now that the nodes are in the DOM */
+        entry.payments.forEach((payment, index) => {
+          const target = document.getElementById("view-qr-" + index);
+          if (!target) return;
+
+          if (!window.QRCode) {
+            target.innerHTML = '<p style="font-size:10px;color:#b91c3c;text-align:center;padding-top:22px;">QR unavailable</p>';
+            return;
+          }
+
+          try {
+            new window.QRCode(target, {
+              text: buildUpiUri(entry.details, payment.paise),
+              width: 160,
+              height: 160,
+              colorDark: "#17131e",
+              colorLight: "#ffffff",
+              correctLevel: window.QRCode.CorrectLevel.M
+            });
+          } catch (error) {
+            target.innerHTML = '<p style="font-size:10px;color:#b91c3c;text-align:center;padding-top:22px;">QR unavailable</p>';
+          }
+        });
+      }
+
+      function openViewModal(id) {
+        const entry = entries.find((item) => item.id === id);
+        if (!entry) return;
+
+        currentViewId = id;
+        ensureEntryArrays(entry);
+
+        renderViewModalContent(entry);
+        viewReuse.dataset.id = id;
+
+        openModal(viewModal, viewClose);
+      }
+
+      function refreshViewModal() {
+        if (!currentViewId) return;
+        const entry = entries.find((item) => item.id === currentViewId);
+        if (!entry) return;
+        renderViewModalContent(entry);
+      }
+
+      /* ---------------- Txn modal ---------------- */
+
+      function setTxnError(message) {
+        txnIdInput.classList.toggle("is-invalid", Boolean(message));
+        txnIdInput.setAttribute("aria-invalid", String(Boolean(message)));
+        txnIdError.textContent = message || "";
+      }
+
+      function openTxnModal(entryId, index) {
+        const entry = entries.find((e) => e.id === entryId);
+        if (!entry) return;
+        if (entry.completed && entry.completed[index]) return;
+
+        ensureEntryArrays(entry);
+
+        txnEntryId = entryId;
+        txnPaymentIndex = index;
+
+        const total = entry.payments.length;
+        const stepNumber = index + 1;
+
+        txnModalPayment.textContent = total > 1
+          ? "Payment " + stepNumber + " of " + total
+          : "Single payment";
+        txnModalAmount.textContent = formatINR(entry.payments[index].paise);
+
+        txnIdInput.value = entry.txnIds[index] || "";
+        setTxnError("");
+
+        txnLastFocused = document.activeElement;
+        txnModal.classList.add("is-open");
+        txnModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+
+        if (window.lucide) window.lucide.createIcons();
+        window.requestAnimationFrame(() => txnIdInput.focus());
+      }
+
+      function closeTxnModal() {
+        txnModal.classList.remove("is-open");
+        txnModal.setAttribute("aria-hidden", "true");
+        setTxnError("");
+        txnEntryId = null;
+        txnPaymentIndex = -1;
+
+        if (!document.querySelector(".modal-backdrop.is-open")) {
+          document.body.classList.remove("modal-open");
+        }
+
+        if (txnLastFocused && typeof txnLastFocused.focus === "function") {
+          try { txnLastFocused.focus(); } catch (_) {}
+        }
+        txnLastFocused = null;
+      }
+
+      function commitTxn() {
+        const value = txnIdInput.value.trim();
+
+        if (!value) {
+          setTxnError("Please enter the transaction ID to confirm this payment.");
+          txnIdInput.focus();
+          return;
+        }
+        if (value.length < 6) {
+          setTxnError("Transaction ID looks too short. Please check and re-enter.");
+          txnIdInput.focus();
+          return;
+        }
+
+        const entryId = txnEntryId;
+        const index = txnPaymentIndex;
+        if (!entryId || index < 0) { closeTxnModal(); return; }
+
+        const entry = entries.find((e) => e.id === entryId);
+        if (!entry) { closeTxnModal(); return; }
+
+        ensureEntryArrays(entry);
+        entry.completed[index] = true;
+        entry.txnIds[index] = value;
+        entry.updatedAt = Date.now();
+
+        saveEntries();
+        render();
+        refreshViewModal();
+
+        showToast("Payment marked as received");
+        closeTxnModal();
+      }
+
+      if (txnModalClose) txnModalClose.addEventListener("click", closeTxnModal);
+      if (txnCancel) txnCancel.addEventListener("click", closeTxnModal);
+      if (txnConfirm) txnConfirm.addEventListener("click", commitTxn);
+
+      if (txnIdInput) {
+        txnIdInput.addEventListener("input", () => {
+          if (txnIdInput.classList.contains("is-invalid")) setTxnError("");
+        });
+        txnIdInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            commitTxn();
+          }
+        });
+      }
+
+      if (txnModal) {
+        txnModal.addEventListener("click", (event) => {
+          if (event.target === txnModal) closeTxnModal();
+        });
+
+        txnModal.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            closeTxnModal();
+            return;
+          }
+          if (event.key !== "Tab") return;
+
+          const focusables = txnModal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (!focusables.length) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          const active = document.activeElement;
+
+          if (event.shiftKey && active === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && active === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        });
+      }
+
+      /* ---------------- Payment toggle handlers ---------------- */
+
+      function handleMarkPaidClick(index) {
+        const entry = entries.find((e) => e.id === currentViewId);
+        if (!entry) return;
+        if (!Number.isInteger(index) || index < 0 || index >= entry.payments.length) return;
+
+        ensureEntryArrays(entry);
+
+        const isPaid = Boolean(entry.completed[index]);
+
+        if (isPaid) {
+          /* Unmark */
+          entry.completed[index] = false;
+          entry.txnIds[index] = "";
+          entry.updatedAt = Date.now();
+
+          saveEntries();
+          render();
+          refreshViewModal();
+          showToast("Payment marked as pending");
+        } else {
+          /* Open txn modal */
+          openTxnModal(entry.id, index);
+        }
+      }
+
+      /* ---------------- Download ---------------- */
+
+      function fileStamp(date) {
+        const d = date || new Date();
+        const p = (n) => String(n).padStart(2, "0");
+        return (
+          p(d.getDate()) + "-" + p(d.getMonth() + 1) + "-" + d.getFullYear() +
+          "_" + p(d.getHours()) + p(d.getMinutes())
+        );
+      }
+
+      function buildHistoryQrCardCanvas(entry, index) {
+        const wrap = document.getElementById("view-qr-" + index);
+        const source = wrap ? wrap.querySelector("canvas, img") : null;
+        if (!source || !entry) return null;
+
+        const details = entry.details;
+        const payment = entry.payments[index];
+        const total = entry.payments.length;
+        const isSplit = total > 1;
+        const stepNumber = index + 1;
+
+        const dpr = 2;
+        const width = 560;
+        const pad = 40;
+        const qrSize = width - pad * 2;
+        const headerH = isSplit ? 186 : 166;
+        const footerH = details.note ? 168 : 140;
+        const height = headerH + qrSize + footerH;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        const ctx = canvas.getContext("2d");
+        ctx.scale(dpr, dpr);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = "#5b35cc";
+        ctx.fillRect(0, 0, width, 8);
+
+        /* Brand badge */
+        const badgeX = pad;
+        const badgeY = 26;
+        const badgeSize = 26;
+
+        const badgeGrad = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeSize, badgeY + badgeSize);
+        badgeGrad.addColorStop(0, "#6d4aff");
+        badgeGrad.addColorStop(1, "#4725b3");
+        ctx.fillStyle = badgeGrad;
+
+        const r = 8;
+        ctx.beginPath();
+        ctx.moveTo(badgeX + r, badgeY);
+        ctx.arcTo(badgeX + badgeSize, badgeY, badgeX + badgeSize, badgeY + badgeSize, r);
+        ctx.arcTo(badgeX + badgeSize, badgeY + badgeSize, badgeX, badgeY + badgeSize, r);
+        ctx.arcTo(badgeX, badgeY + badgeSize, badgeX, badgeY, r);
+        ctx.arcTo(badgeX, badgeY, badgeX + badgeSize, badgeY, r);
+        ctx.closePath();
+        ctx.fill();
+
+        const finder = 5;
+        const inner = 2;
+        const gap = 2;
+        const blockSize = finder * 2 + gap;
+        const gx = badgeX + (badgeSize - blockSize) / 2;
+        const gy = badgeY + (badgeSize - blockSize) / 2;
+
+        const drawFinder = (x, y) => {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(x, y, finder, finder);
+          ctx.fillStyle = "rgba(71, 37, 179, 1)";
+          ctx.fillRect(x + (finder - inner) / 2, y + (finder - inner) / 2, inner, inner);
+        };
+
+        drawFinder(gx, gy);
+        drawFinder(gx + finder + gap, gy);
+        drawFinder(gx, gy + finder + gap);
+
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#5b35cc";
+        ctx.font = "700 13px 'Work Sans', Arial, sans-serif";
+        ctx.fillText("COLLECT SMARTER", badgeX + badgeSize + 12, badgeY + badgeSize / 2 + 1);
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
+
+        let y = 84;
+
+        ctx.fillStyle = "#5b35cc";
+        ctx.font = "700 13px 'Work Sans', Arial, sans-serif";
+        ctx.fillText(
+          (isSplit ? "STEP " + stepNumber + " OF " + total : "UPI PAYMENT").toUpperCase(),
+          width / 2,
+          y
+        );
+
+        y += 46;
+        ctx.fillStyle = "#1f1b33";
+        ctx.font = "700 40px 'Work Sans', Arial, sans-serif";
+        ctx.fillText(formatINR(payment.paise), width / 2, y);
+
+        if (isSplit) {
+          y += 26;
+          ctx.fillStyle = "#6f6a80";
+          ctx.font = "500 15px 'Work Sans', Arial, sans-serif";
+          ctx.fillText("Part " + stepNumber + " of a " + total + "-part split", width / 2, y);
+        }
+
+        const qrTop = headerH;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(pad, qrTop, qrSize, qrSize);
+
+        if (source.tagName === "IMG") {
+          ctx.drawImage(source, pad, qrTop, qrSize, qrSize);
+        } else {
+          ctx.drawImage(source, 0, 0, source.width, source.height, pad, qrTop, qrSize, qrSize);
+        }
+
+        ctx.strokeStyle = "#e6e3ed";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pad + 0.5, qrTop + 0.5, qrSize - 1, qrSize - 1);
+
+        const footerTop = qrTop + qrSize;
+        ctx.strokeStyle = "#e6e3ed";
+        ctx.beginPath();
+        ctx.moveTo(pad, footerTop + 1);
+        ctx.lineTo(width - pad, footerTop + 1);
+        ctx.stroke();
+
+        y = footerTop + 40;
+        ctx.fillStyle = "#1f1b33";
+        ctx.font = "700 20px 'Work Sans', Arial, sans-serif";
+        ctx.fillText(details.name, width / 2, y);
+
+        y += 28;
+        ctx.fillStyle = "#4a4355";
+        ctx.font = "500 16px 'Work Sans', Arial, sans-serif";
+        ctx.fillText(details.upi, width / 2, y);
+
+        if (details.note) {
+          y += 28;
+          ctx.fillStyle = "#4725b3";
+          ctx.font = "600 15px 'Work Sans', Arial, sans-serif";
+          ctx.fillText('"' + details.note + '"', width / 2, y);
+        }
+
+        y += 30;
+        ctx.fillStyle = "#8b869c";
+        ctx.font = "500 12px 'Work Sans', Arial, sans-serif";
+        ctx.fillText("Scan with any UPI app to pay", width / 2, y);
+
+        y += 20;
+        ctx.fillStyle = "#a8a3b8";
+        ctx.font = "500 11px 'Work Sans', Arial, sans-serif";
+        ctx.fillText("Developed By ~ Shankar Prasad Pyke", width / 2, y);
+
+        return canvas;
+      }
+
+      function downloadViewQr(index) {
+        const entry = entries.find((item) => item.id === currentViewId);
+        if (!entry) return;
+
+        const canvas = buildHistoryQrCardCanvas(entry, index);
+        if (!canvas) {
+          showToast("QR not ready yet — try again");
+          return;
+        }
+
+        const total = entry.payments.length;
+        const isSplit = total > 1;
+
+        const rupees = entry.payments[index].paise / 100;
+        const amountLabel = Number.isInteger(rupees)
+          ? String(rupees)
+          : rupees.toFixed(2).replace(/\.?0+$/, "");
+
+        const parts = ["COLLECT SMARTER", "upi"];
+
+        const nameSlug = slugify(entry.details.name.split(/\s+/)[0], 18);
+        if (nameSlug) parts.push(nameSlug);
+
+        parts.push("Rs" + amountLabel);
+
+        if (isSplit) parts.push("part" + String(index + 1).padStart(2, "0") + "of" + total);
+
+        if (entry.details.note) {
+          const noteSlug = slugify(entry.details.note, 24);
+          if (noteSlug) parts.push(noteSlug);
+        }
+
+        parts.push(fileStamp());
+
+        let href = "";
+        try {
+          href = canvas.toDataURL("image/png");
+        } catch (error) {
+          showToast("Could not generate the PNG");
+          return;
+        }
+
+        const link = document.createElement("a");
+        link.download = parts.join("_") + ".png";
+        link.href = href;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        showToast("PNG downloaded");
+      }
+
+      function copyViewTxn(index) {
+        const entry = entries.find((item) => item.id === currentViewId);
+        if (!entry) return;
+
+        const txn = entry.txnIds && entry.txnIds[index] ? String(entry.txnIds[index]) : "";
+        if (!txn) {
+          showToast("No transaction ID available");
+          return;
+        }
+
+        copyText(txn, "Transaction ID copied");
+      }
+
+      /* ---------------- View modal wiring ---------------- */
+
+      if (viewClose) viewClose.addEventListener("click", () => closeModal(viewModal));
+      if (viewClose2) viewClose2.addEventListener("click", () => closeModal(viewModal));
+
+      if (viewReuse) {
+        viewReuse.addEventListener("click", () => {
+          const id = viewReuse.dataset.id;
+          if (id && entries.some((e) => e.id === id)) reuseEntry(id);
+        });
+      }
+
+      if (viewBody) {
+        viewBody.addEventListener("click", (event) => {
+          /* Download */
+          const downloadBtn = event.target.closest("[data-view-download]");
+          if (downloadBtn) {
+            downloadViewQr(Number(downloadBtn.dataset.viewDownload));
+            return;
+          }
+
+          /* Copy Txn ID */
+          const copyBtn = event.target.closest("[data-copy-txn]");
+          if (copyBtn) {
+            if (copyBtn.hasAttribute("disabled")) return;
+            copyViewTxn(Number(copyBtn.dataset.copyTxn));
+            return;
+          }
+
+          /* Mark as paid toggle */
+          const toggleBtn = event.target.closest("[data-mark-paid]");
+          if (toggleBtn) {
+            handleMarkPaidClick(Number(toggleBtn.dataset.markPaid));
+            return;
+          }
+        });
+      }
+
+      /* ---------------- Actions ---------------- */
+
+      function reuseEntry(id) {
+        if (!id) return;
+        window.location.href = "index.html?reuse=" + encodeURIComponent(id);
+      }
+
+      function askDelete(id) {
+        const entry = entries.find((item) => item.id === id);
+        if (!entry) return;
+
+        confirmTitle.textContent = "Delete this collection?";
+        confirmDesc.textContent = "This collection will be removed from your history.";
+        confirmBody.innerHTML =
+          "You are deleting the " + escapeHtml(formatINR(entry.details.amountPaise)) +
+          " collection for " + escapeHtml(entry.details.name || "this account") +
+          ". <strong>This action cannot be undone.</strong>";
+        confirmOkText.textContent = "Yes, Delete";
+
+        pendingAction = () => {
+          entries = entries.filter((item) => item.id !== id);
+          saveEntries();
+          render();
+          if (currentViewId === id) {
+            currentViewId = "";
+            closeModal(viewModal);
+          }
+        };
+
+        openModal(confirmModal, confirmCancel);
+      }
+
+      function askClearAll() {
+        if (!entries.length) return;
+
+        confirmTitle.textContent = "Clear all history?";
+        confirmDesc.textContent = "This removes every saved collection from this browser.";
+        confirmBody.innerHTML =
+          "Your current payment session in the generator is not affected. " +
+          "<strong>This action cannot be undone.</strong>";
+        confirmOkText.textContent = "Yes, Clear All";
+
+        pendingAction = () => {
+          entries = [];
+          saveEntries();
+          render();
+          currentViewId = "";
+        };
+
+        openModal(confirmModal, confirmCancel);
+      }
+
+      if (confirmCancel) {
+        confirmCancel.addEventListener("click", () => {
+          pendingAction = null;
+          closeModal(confirmModal);
+        });
+      }
+
+      if (confirmOk) {
+        confirmOk.addEventListener("click", () => {
+          const action = pendingAction;
+          pendingAction = null;
+          closeModal(confirmModal);
+          if (typeof action === "function") action();
+        });
+      }
+
+      if (els.clearAll) {
+        els.clearAll.addEventListener("click", askClearAll);
+      }
+
+      /* ---------------- List interactions ---------------- */
+
+      if (els.list) {
+        els.list.addEventListener("click", (event) => {
+          const btn = event.target.closest("[data-action]");
+          if (!btn) return;
+
+          const id = btn.dataset.id;
+          const action = btn.dataset.action;
+
+          if (action === "view") openViewModal(id);
+          else if (action === "reuse") reuseEntry(id);
+          else if (action === "delete") askDelete(id);
+        });
+      }
+
+      /* ---------------- Filters & search ---------------- */
+
+      if (els.filters) {
+        els.filters.addEventListener("click", (event) => {
+          const chip = event.target.closest("[data-filter]");
+          if (!chip) return;
+
+          activeFilter = chip.dataset.filter || "all";
+
+          els.filters.querySelectorAll(".filter-chip").forEach((node) => {
+            const isActive = node === chip;
+            node.classList.toggle("is-active", isActive);
+            node.setAttribute("aria-pressed", String(isActive));
+          });
+
+          render();
+        });
+      }
+
+      if (els.search) {
+        els.search.addEventListener("input", () => {
+          searchQuery = els.search.value || "";
+          render();
+        });
+      }
+
+      /* ---------------- Init ---------------- */
+
+      function init() {
+        loadEntries();
+        render();
+
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init, { once: true });
+      } else {
+        init();
+      }
+
+      /* Refresh when returning via back/forward cache */
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          loadEntries();
+          render();
+        }
+      });
+
+      /* Keep multiple tabs in sync */
+      window.addEventListener("storage", (event) => {
+        if (event.key !== HISTORY_KEY) return;
+        loadEntries();
+        render();
+        refreshViewModal();
+      });
+    })();
+  </script>
+</body>
+</html>
