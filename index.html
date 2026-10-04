@@ -619,6 +619,277 @@
       .scroll-to-qr { display: none !important; }
     }
 
+    /* ------------------------------------------------------------------ *
+ * Full-screen QR viewer
+ * ------------------------------------------------------------------ */
+
+.qr-zoom-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  border-radius: inherit;
+  background: linear-gradient(to top, rgba(23,19,30,.55), transparent 45%);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+.qr-canvas-wrap:hover .qr-zoom-hint,
+.qr-canvas-wrap:focus-visible .qr-zoom-hint { opacity: 1; }
+.qr-canvas-wrap { cursor: zoom-in; }
+.qr-canvas-wrap:focus-visible {
+  outline: 3px solid rgba(91, 53, 204, .35);
+  outline-offset: 3px;
+}
+
+.qr-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  padding-top: max(20px, env(safe-area-inset-top));
+  background: rgba(255, 255, 255, 0.98);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease, visibility 0s linear .3s;
+  touch-action: manipulation;
+}
+.qr-zoom.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .3s ease, visibility 0s linear 0s;
+}
+
+.qr-zoom__close {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 9999px;
+  background: #f1edff;
+  color: #5b35cc;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.qr-zoom__close:hover { background: #e5ddff; transform: scale(1.06); }
+.qr-zoom__close:active { transform: scale(.94); }
+.qr-zoom__close:focus-visible { outline: 3px solid rgba(91,53,204,.35); outline-offset: 3px; }
+
+.qr-zoom__amount {
+  font-size: clamp(26px, 7vw, 40px);
+  font-weight: 700;
+  color: #1f1b33;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.qr-zoom__step {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: #5b35cc;
+}
+
+.qr-zoom__qr {
+  width: min(78vw, 78vh, 460px);
+  height: min(78vw, 78vh, 460px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 60px rgba(41, 28, 83, .22);
+}
+.qr-zoom__qr canvas,
+.qr-zoom__qr img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.qr-zoom__meta {
+  text-align: center;
+  font-size: 14px;
+  color: #6f6a80;
+  line-height: 1.5;
+  max-width: 32ch;
+  word-break: break-word;
+}
+.qr-zoom__meta strong { color: #1f1b33; }
+
+.qr-zoom__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------ *
+ * Full-screen viewer — "Mark as paid" button
+ * ------------------------------------------------------------------ */
+
+.qr-zoom__paid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 48px;
+  padding: 0.7rem 1.15rem;
+  border-radius: 9999px;
+  border: 1.5px solid #e6e3ed;
+  background: #fff;
+  color: #4a4355;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .28s ease, border-color .28s ease, color .28s ease,
+              transform .18s ease, box-shadow .28s ease;
+}
+
+.qr-zoom__paid:hover {
+  background: #faf9ff;
+  border-color: #cfc6ea;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(91, 53, 204, .10);
+}
+.qr-zoom__paid:active { transform: translateY(0) scale(.98); }
+.qr-zoom__paid:focus-visible {
+  outline: 3px solid rgba(91, 53, 204, .35);
+  outline-offset: 3px;
+}
+
+.qr-zoom__paid-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 2px solid #d5cfe6;
+  background: #fff;
+  transition: background .28s ease, border-color .28s ease,
+              transform .38s cubic-bezier(.22, 1.5, .4, 1), box-shadow .28s ease;
+}
+.qr-zoom__paid-box svg {
+  width: 13px;
+  height: 13px;
+  stroke: #fff;
+  opacity: 0;
+  transform: scale(.3) rotate(-28deg);
+  transition: opacity .2s ease, transform .38s cubic-bezier(.22, 1.5, .4, 1);
+}
+
+.qr-zoom__paid.is-paid {
+  background: #f2fdf8;
+  border-color: #a7e8c8;
+  color: #06794f;
+}
+.qr-zoom__paid.is-paid:hover {
+  background: #eafaf3;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, .18);
+}
+.qr-zoom__paid.is-paid .qr-zoom__paid-box {
+  background: #10b981;
+  border-color: #10b981;
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, .34);
+}
+.qr-zoom__paid.is-paid .qr-zoom__paid-box svg {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* ------------------------------------------------------------------ *
+ * Full-screen viewer — prev/next navigation
+ * ------------------------------------------------------------------ */
+
+.qr-zoom__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid #e6e3ed;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #5b35cc;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(41, 28, 83, .14);
+  transition: background .2s ease, transform .2s ease,
+              box-shadow .2s ease, opacity .2s ease, visibility .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.qr-zoom__nav--prev { left: max(14px, env(safe-area-inset-left)); }
+.qr-zoom__nav--next { right: max(14px, env(safe-area-inset-right)); }
+
+.qr-zoom__nav:hover { background: #f1edff; transform: translateY(-50%) scale(1.06); }
+.qr-zoom__nav:active { transform: translateY(-50%) scale(.94); }
+.qr-zoom__nav:focus-visible {
+  outline: 3px solid rgba(91, 53, 204, .35);
+  outline-offset: 3px;
+}
+
+/* Hide the buttons when there is only one QR code */
+.qr-zoom__nav.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .qr-zoom__nav {
+    width: 44px;
+    height: 44px;
+    top: auto;
+    bottom: max(18px, env(safe-area-inset-bottom));
+    transform: none;
+  }
+  .qr-zoom__nav:hover,
+  .qr-zoom__nav:active { transform: none; }
+}
+
+@media print {
+  .qr-zoom__nav { display: none !important; }
+}
+
+body.qr-zoom-open { overflow: hidden; }
+
+@media print {
+  .qr-zoom { display: none !important; }
+}
+
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
@@ -1126,6 +1397,53 @@
 
   <aside id="print-area" aria-hidden="true"></aside>
 
+  <!-- Full-screen QR viewer -->
+<div id="qr-zoom" class="qr-zoom" role="dialog" aria-modal="true"
+     aria-labelledby="qr-zoom-amount" aria-hidden="true">
+  <button id="qr-zoom-close" type="button" class="qr-zoom__close"
+          aria-label="Close full-screen QR">
+    <i data-lucide="x" style="width:22px;height:22px" aria-hidden="true"></i>
+  </button>
+
+    <button id="qr-zoom-prev" type="button" class="qr-zoom__nav qr-zoom__nav--prev is-hidden"
+          aria-label="Previous QR code">
+    <i data-lucide="chevron-left" style="width:24px;height:24px" aria-hidden="true"></i>
+  </button>
+
+  <button id="qr-zoom-next" type="button" class="qr-zoom__nav qr-zoom__nav--next is-hidden"
+          aria-label="Next QR code">
+    <i data-lucide="chevron-right" style="width:24px;height:24px" aria-hidden="true"></i>
+  </button>
+
+  <p id="qr-zoom-step" class="qr-zoom__step"></p>
+  <p id="qr-zoom-amount" class="qr-zoom__amount"></p>
+
+  <div id="qr-zoom-qr" class="qr-zoom__qr" role="img"
+       aria-label="Enlarged UPI QR code for scanning"></div>
+
+  <p id="qr-zoom-meta" class="qr-zoom__meta"></p>
+
+  <div class="qr-zoom__actions">
+<button id="qr-zoom-paid" type="button"
+        class="qr-zoom__paid"
+        aria-pressed="false">
+  <span class="qr-zoom__paid-box" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </span>
+  <span class="qr-zoom__paid-text">Mark as paid</span>
+</button>
+    <button id="qr-zoom-download" type="button"
+            class="primary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold text-white"
+            style="background:rgb(91,53,204);color:#fff;">
+      <i data-lucide="download" style="width:17px;height:17px" aria-hidden="true"></i>
+      <span style="color:#fff;font-weight:600;font-size:14px;">Download PNG</span>
+    </button>
+  </div>
+</div>
+
   <!-- Scroll to Collection Progress button (Payment Summary only) -->
   <button id="scroll-to-qr" type="button"
           class="scroll-to-qr"
@@ -1209,6 +1527,18 @@
       const confirmModal = document.getElementById("confirm-modal");
       const confirmResetBtn = document.getElementById("confirm-reset");
       const confirmCancelBtn = document.getElementById("confirm-cancel");
+      const zoomEl = document.getElementById("qr-zoom");
+const zoomQrBox = document.getElementById("qr-zoom-qr");
+const zoomStep = document.getElementById("qr-zoom-step");
+const zoomAmount = document.getElementById("qr-zoom-amount");
+const zoomMeta = document.getElementById("qr-zoom-meta");
+const zoomClose = document.getElementById("qr-zoom-close");
+const zoomPaid = document.getElementById("qr-zoom-paid");
+const zoomDownload = document.getElementById("qr-zoom-download");
+const zoomPrev = document.getElementById("qr-zoom-prev");
+const zoomNext = document.getElementById("qr-zoom-next");
+let zoomIndex = -1;
+let lastFocusedBeforeZoom = null;
 
       /* ------------------------------------------------------------------ *
        * Small utilities
@@ -1508,9 +1838,12 @@
                 (isSplit ? "STEP " + stepNumber : "UPI") +
               "</div>" +
             "</div>" +
-            '<div class="qr-canvas-wrap mx-auto flex aspect-square w-full max-w-[235px] items-center justify-center rounded-xl border border-slate-100 bg-white p-3"' +
-              ' id="qr-' + index + '" role="img"' +
-              ' aria-label="UPI QR code for payment ' + stepNumber + " of " + total + '"></div>' +
+'<div class="qr-canvas-wrap relative mx-auto flex aspect-square w-full max-w-[235px] items-center justify-center rounded-xl border border-slate-100 bg-white p-3"' +
+  ' id="qr-' + index + '" role="button" tabindex="0"' +
+  ' data-zoom-index="' + index + '"' +
+  ' aria-label="Tap to enlarge UPI QR code for payment ' + stepNumber + " of " + total + '">' +
+  '<span class="qr-zoom-hint">Tap to enlarge</span>' +
+"</div>" +
             '<div class="mt-5 border-t border-slate-100 pt-4">' +
               '<p class="break-all text-sm font-medium text-slate-700">' + upi + "</p>" +
               '<p class="mt-2 text-xs leading-5 text-slate-500">' + hintText + "</p>" +
@@ -1670,6 +2003,118 @@
           card.classList.add("just-checked");
         }
       }
+
+      /* ------------------------------------------------------------------ *
+ * Full-screen QR viewer
+ * ------------------------------------------------------------------ */
+
+function openQrZoom(index, options) {
+  if (!state.payments[index]) return;
+
+  const opts = options || {};
+  const isStep = Boolean(opts.step);   // true when called from prev/next
+
+  zoomIndex = index;
+
+  // Remember the original trigger ONLY on the first open.
+  // Stepping (prev/next) must not overwrite it, or focus-return breaks.
+  if (!isStep) {
+    lastFocusedBeforeZoom = document.activeElement;
+  }
+
+  const total = state.payments.length;
+  const isSplit = total > 1;
+  const stepNumber = index + 1;
+
+  zoomStep.textContent = isSplit
+    ? "Step " + stepNumber + " of " + total
+    : "UPI Payment";
+  zoomAmount.textContent = formatINR(state.payments[index].paise);
+  zoomMeta.innerHTML =
+    "<strong>" + escapeHtml(state.details.name) + "</strong><br>" +
+    escapeHtml(state.details.upi) +
+    (state.details.note
+      ? '<br><em>"' + escapeHtml(state.details.note) + '"</em>'
+      : "");
+
+  const dataUrl = qrDataUrl(index);
+  zoomQrBox.innerHTML = "";
+  if (dataUrl) {
+    const img = document.createElement("img");
+    img.src = dataUrl;
+    img.alt = "Enlarged UPI QR code for payment " + stepNumber;
+    img.decoding = "sync";
+    img.style.display = "block";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "contain";
+    zoomQrBox.appendChild(img);
+  } else {
+    zoomQrBox.innerHTML =
+      '<p style="color:#d43f5e;font-size:14px;font-weight:600;text-align:center">' +
+      "QR image unavailable. Please regenerate.</p>";
+  }
+
+  // Reflect paid state on the button
+  const isPaid = Boolean(state.completed[index]);
+  if (zoomPaid) {
+    zoomPaid.classList.toggle("is-paid", isPaid);
+    zoomPaid.setAttribute("aria-pressed", String(isPaid));
+    const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
+    if (paidText) {
+      paidText.textContent = isPaid ? "Paid (tap to undo)" : "Mark as paid";
+    }
+  }
+
+  // Show nav buttons only when there is more than one QR code
+  const multi = total > 1;
+  if (zoomPrev) zoomPrev.classList.toggle("is-hidden", !multi);
+  if (zoomNext) zoomNext.classList.toggle("is-hidden", !multi);
+
+  // First open: add the class + body lock + focus the close button.
+  // Stepping: only refresh the content, keep the user's focus where it is.
+  if (!isStep) {
+    zoomEl.classList.add("is-open");
+    zoomEl.setAttribute("aria-hidden", "false");
+    document.body.classList.add("qr-zoom-open");
+
+    if (window.lucide) window.lucide.createIcons();
+    window.requestAnimationFrame(() => zoomClose.focus());
+  }
+}
+
+function closeQrZoom() {
+  if (!zoomEl.classList.contains("is-open")) {
+  zoomIndex = -1;
+  return;
+}
+
+  zoomEl.classList.remove("is-open");
+  zoomEl.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("qr-zoom-open");
+
+  // Clear cloned QR to free memory
+  setTimeout(() => { if (!zoomEl.classList.contains("is-open")) zoomQrBox.innerHTML = ""; }, 320);
+
+  if (lastFocusedBeforeZoom && typeof lastFocusedBeforeZoom.focus === "function") {
+    lastFocusedBeforeZoom.focus();
+  }
+  lastFocusedBeforeZoom = null;
+  zoomIndex = -1;
+}
+
+/**
+ * Move to the previous / next QR code while the overlay is open.
+ * Wraps around so you can cycle endlessly.
+ */
+function stepQrZoom(direction) {
+  if (zoomIndex < 0) return;
+  const total = state.payments.length;
+  if (total < 2) return;
+
+  const next = (zoomIndex + direction + total) % total;
+  openQrZoom(next, { step: true });
+}
 
       /* ------------------------------------------------------------------ *
        * Summary
@@ -2042,6 +2487,7 @@ function printAll() {
        * ------------------------------------------------------------------ */
 
       function resetApp() {
+        closeQrZoom();
         el.form.reset();
         clearAllErrors();
         setStatus(el.status, "", "");
@@ -2369,10 +2815,28 @@ function printAll() {
       el.detailsTab.addEventListener("keydown", handleTabKeys);
       el.summaryTab.addEventListener("keydown", handleTabKeys);
 
-      el.qrGrid.addEventListener("click", (event) => {
-        const button = event.target.closest(".download-button");
-        if (button) downloadQrPng(Number(button.dataset.index));
-      });
+el.qrGrid.addEventListener("click", (event) => {
+  const downloadBtn = event.target.closest(".download-button");
+  if (downloadBtn) {
+    downloadQrPng(Number(downloadBtn.dataset.index));
+    return;
+  }
+
+  // Tapping the QR itself opens full-screen mode
+  const zoomTarget = event.target.closest(".qr-canvas-wrap[data-zoom-index]");
+  if (zoomTarget) {
+    openQrZoom(Number(zoomTarget.dataset.zoomIndex));
+  }
+});
+
+// Keyboard support: Enter/Space on a focused QR opens the overlay
+el.qrGrid.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const zoomTarget = event.target.closest(".qr-canvas-wrap[data-zoom-index]");
+  if (!zoomTarget) return;
+  event.preventDefault();
+  openQrZoom(Number(zoomTarget.dataset.zoomIndex));
+});
 
       // Restrict the amount field to numbers only (digits + one dot + up to 2 decimals)
       function sanitizeAmountInput() {
@@ -2518,6 +2982,99 @@ function printAll() {
       if (scrollToQrBtn) {
         scrollToQrBtn.addEventListener("click", scrollToQrSection);
       }
+
+      /* ------------------------------------------------------------------ *
+ * Full-screen QR viewer events
+ * ------------------------------------------------------------------ */
+
+if (zoomClose) zoomClose.addEventListener("click", closeQrZoom);
+
+if (zoomEl) {
+  zoomEl.addEventListener("click", (event) => {
+    // Tap the backdrop (not the QR or buttons) to close
+    if (event.target === zoomEl) closeQrZoom();
+  });
+
+  zoomEl.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeQrZoom();
+      return;
+    }
+    if (event.key !== "Tab") return;
+
+    const focusables = zoomEl.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+}
+
+// Global Escape safety net — closes the overlay even if focus
+// somehow leaves it (e.g. browser quirks, future edits).
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && zoomEl && zoomEl.classList.contains("is-open")) {
+    event.preventDefault();
+    closeQrZoom();
+  }
+});
+
+if (zoomPaid) {
+  zoomPaid.addEventListener("click", () => {
+    if (zoomIndex < 0) return;
+    const box = el.qrGrid.querySelector('.paid-checkbox[data-index="' + zoomIndex + '"]');
+    if (!box) return;
+
+    box.checked = !box.checked;
+    state.completed[zoomIndex] = box.checked;
+    paintCardPaidState(box);
+    renderProgress();
+
+    zoomPaid.classList.toggle("is-paid", box.checked);
+    zoomPaid.setAttribute("aria-pressed", String(box.checked));
+    const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
+    if (paidText) {
+      paidText.textContent = box.checked ? "Paid (tap to undo)" : "Mark as paid";
+    }
+  });
+}
+
+if (zoomDownload) {
+  zoomDownload.addEventListener("click", () => {
+    if (zoomIndex >= 0) downloadQrPng(zoomIndex);
+  });
+}
+
+if (zoomPrev) {
+  zoomPrev.addEventListener("click", () => stepQrZoom(-1));
+}
+
+if (zoomNext) {
+  zoomNext.addEventListener("click", () => stepQrZoom(1));
+}
+
+// Arrow-key navigation while the overlay is open
+document.addEventListener("keydown", (event) => {
+  if (!zoomEl || !zoomEl.classList.contains("is-open")) return;
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    stepQrZoom(-1);
+  } else if (event.key === "ArrowRight") {
+    event.preventDefault();
+    stepQrZoom(1);
+  }
+});
 
       // Recompute on scroll (passive = no jank)
       window.addEventListener("scroll", updateScrollButton, { passive: true });
