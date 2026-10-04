@@ -142,7 +142,6 @@
     font-family: "Work Sans", Arial, sans-serif;
   }
 
-  /* ---------- Header ---------- */
   .print-head {
     border-bottom: 3px solid #28196b;
     padding-bottom: 12px;
@@ -190,7 +189,6 @@
   .print-head .meta-grid p { margin: 0; }
   .print-head .meta-grid strong { color: #1f1b33; }
 
-  /* ---------- Cards ---------- */
   .print-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -207,7 +205,6 @@
     position: relative;
   }
   .print-card::after {
-    /* dashed cut line so you can trim cleanly */
     content: "";
     position: absolute;
     inset: 4px;
@@ -268,7 +265,6 @@
     margin: 3px 0 0;
   }
 
-  /* ---------- Footer ---------- */
   .print-foot {
     margin-top: 18px;
     padding-top: 10px;
@@ -282,10 +278,6 @@
 }
 
     [aria-live]:empty { display: none; }
-
-    /* ------------------------------------------------------------------ *
-     * Info button + modal
-     * ------------------------------------------------------------------ */
 
     .info-button {
       display: inline-flex;
@@ -327,7 +319,10 @@
       visibility: visible;
       transition: opacity .28s ease, visibility 0s linear 0s;
     }
-
+    /* Transaction ID modal must stack ABOVE the full-screen QR viewer (z-index: 100) */
+    #txn-modal.modal-backdrop {
+      z-index: 120;
+    }
     .modal-panel {
       position: relative;
       width: 100%;
@@ -355,10 +350,6 @@
     }
 
     body.modal-open { overflow: hidden; }
-
-    /* ------------------------------------------------------------------ *
-     * Collection progress + payment checklist
-     * ------------------------------------------------------------------ */
 
     .progress-card {
       transition: border-color .45s ease, box-shadow .45s ease, background .45s ease;
@@ -410,7 +401,6 @@
       100% { transform: scale(1);    opacity: 1; }
     }
 
-    /* Checklist pills */
     .checklist-pill {
       display: inline-flex;
       align-items: center;
@@ -446,7 +436,6 @@
       transform: scale(1) rotate(0deg);
     }
 
-    /* QR cards */
     .qr-card {
       transition: border-color .35s ease, background .35s ease, box-shadow .35s ease, transform .3s ease;
     }
@@ -462,7 +451,6 @@
       100% { transform: scale(1); }
     }
 
-    /* "Mark as paid" toggle */
     .paid-toggle {
       display: flex;
       align-items: center;
@@ -542,10 +530,6 @@
     }
     .paid-toggle.is-paid .paid-toggle-text { color: #06794f; }
 
-        /* ------------------------------------------------------------------ *
-     * Scroll-to-QR floating button (Payment Summary only)
-     * ------------------------------------------------------------------ */
-
     .scroll-to-qr {
       position: fixed;
       right: 22px;
@@ -604,7 +588,6 @@
       outline-offset: 3px;
     }
 
-    /* Slightly smaller on phones */
     @media (max-width: 480px) {
       .scroll-to-qr {
         right: 16px;
@@ -614,14 +597,9 @@
       }
     }
 
-    /* Never show in print */
     @media print {
       .scroll-to-qr { display: none !important; }
     }
-
-    /* ------------------------------------------------------------------ *
- * Full-screen QR viewer
- * ------------------------------------------------------------------ */
 
 .qr-zoom-hint {
   position: absolute;
@@ -751,10 +729,6 @@
   justify-content: center;
 }
 
-/* ------------------------------------------------------------------ *
- * Full-screen viewer — "Mark as paid" button
- * ------------------------------------------------------------------ */
-
 .qr-zoom__paid {
   display: inline-flex;
   align-items: center;
@@ -827,10 +801,6 @@
   transform: scale(1) rotate(0deg);
 }
 
-/* ------------------------------------------------------------------ *
- * Full-screen viewer — prev/next navigation
- * ------------------------------------------------------------------ */
-
 .qr-zoom__nav {
   position: absolute;
   top: 50%;
@@ -861,7 +831,6 @@
   outline-offset: 3px;
 }
 
-/* Hide the buttons when there is only one QR code */
 .qr-zoom__nav.is-hidden {
   opacity: 0;
   visibility: hidden;
@@ -938,11 +907,20 @@ body.qr-zoom-open { overflow: hidden; }
         </div>
       </div>
 
-      <div class="flex w-fit items-center gap-2 rounded-full border border-indigo-100 px-4 py-2.5 text-sm font-semibold shadow-sm"
-          style="background: rgb(241, 237, 255); color: rgb(75, 43, 182);">
-        <i data-lucide="shield-check" style="width:18px;height:18px" aria-hidden="true"></i>
-        <span style="color: rgb(75, 43, 182); font-weight: 600; font-size: 14px;">Private in your browser</span>
-      </div>
+<div class="flex w-fit flex-row items-center gap-2 sm:flex-col sm:items-end sm:gap-2">
+  <div class="flex w-fit items-center gap-2 rounded-full border border-indigo-100 px-4 py-2.5 text-sm font-semibold shadow-sm"
+      style="background: rgb(241, 237, 255); color: rgb(75, 43, 182);">
+    <i data-lucide="shield-check" style="width:18px;height:18px" aria-hidden="true"></i>
+    <span style="color: rgb(75, 43, 182); font-weight: 600; font-size: 14px;">Private in your browser</span>
+  </div>
+
+  <a href="history.html"
+     class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm"
+     style="color: rgb(64, 57, 77); text-decoration: none;">
+    <i data-lucide="history" style="width:18px;height:18px;color:#5b35cc" aria-hidden="true"></i>
+    <span style="color: rgb(64, 57, 77); font-weight: 600; font-size: 14px;">History</span>
+  </a>
+</div>
     </header>
 
     <main class="w-full">
@@ -962,7 +940,6 @@ body.qr-zoom-open { overflow: hidden; }
           </button>
         </nav>
 
-        <!-- STEP 1 -->
         <section id="details-panel" class="panel-enter p-5 sm:p-8 lg:p-10" role="tabpanel"
                  aria-labelledby="details-tab" tabindex="0">
           <div class="mb-5 flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-end">
@@ -1031,7 +1008,6 @@ body.qr-zoom-open { overflow: hidden; }
                         aria-describedby="amount-help amount-preview amount-error">
                 </div>
 
-                <!-- Quick amount chips -->
                 <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick amount presets">
                   <button type="button" class="amount-chip secondary-action rounded-full px-3 py-1 text-xs font-semibold" data-amount="500">₹500</button>
                   <button type="button" class="amount-chip secondary-action rounded-full px-3 py-1 text-xs font-semibold" data-amount="1000">₹1,000</button>
@@ -1060,7 +1036,6 @@ body.qr-zoom-open { overflow: hidden; }
               </div>
             </div>
 
-            <!-- Split preview -->
             <div id="split-preview" class="mt-6 hidden rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-950">
               <div class="flex items-start gap-3">
                 <i data-lucide="split" style="width:18px;height:18px;flex:none;margin-top:2px;color:#4725b3" aria-hidden="true"></i>
@@ -1091,7 +1066,6 @@ body.qr-zoom-open { overflow: hidden; }
           </form>
         </section>
 
-        <!-- STEP 2 -->
         <section id="summary-panel" class="hidden p-5 sm:p-8 lg:p-10" role="tabpanel"
                  aria-labelledby="summary-tab" tabindex="0">
           <div id="summary-empty" class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
@@ -1108,7 +1082,6 @@ body.qr-zoom-open { overflow: hidden; }
           </div>
 
           <div id="summary-content" class="hidden">
-            <!-- Header -->
             <div class="mb-6 flex flex-col justify-between gap-5 border-b border-slate-100 pb-7 lg:flex-row lg:items-start">
               <div>
                 <p class="text-xs font-bold uppercase tracking-[0.16em]"
@@ -1146,7 +1119,6 @@ body.qr-zoom-open { overflow: hidden; }
               </div>
             </div>
 
-            <!-- Stats -->
             <h3 class="mb-3 font-bold" style="color: rgb(31, 27, 51); font-weight: 700; font-size: 18px;">
               Your collection at a glance
             </h3>
@@ -1178,9 +1150,6 @@ body.qr-zoom-open { overflow: hidden; }
               <span id="summary-note-value"></span>
             </div>
 
-            <!-- ============================================================ -->
-            <!-- Collection progress + interactive checklist                  -->
-            <!-- ============================================================ -->
             <div id="progress-card" class="progress-card mb-8 hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
                 <div class="min-w-0">
@@ -1225,7 +1194,6 @@ body.qr-zoom-open { overflow: hidden; }
 
             <p id="summary-status" class="mb-5 text-sm font-medium text-rose-600" aria-live="assertive"></p>
 
-            <!-- QR list heading -->
             <div class="mb-4 flex items-center justify-between gap-3">
               <h3 class="font-bold" style="color: rgb(31, 27, 51); font-weight: 700; font-size: 18px;">
                 Your QR codes
@@ -1243,11 +1211,10 @@ body.qr-zoom-open { overflow: hidden; }
     </main>
   </div>
 
-  <!-- Info modal: How to collect your payment -->
+  <!-- Info modal -->
   <div id="info-modal" class="modal-backdrop" role="dialog" aria-modal="true"
        aria-labelledby="info-modal-title" aria-hidden="true">
     <div class="modal-panel" role="document">
-
       <div class="flex items-start gap-3 border-b border-indigo-100 bg-indigo-50 px-5 py-4 sm:px-6">
         <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-indigo-600 text-white" aria-hidden="true">
           <i data-lucide="list-checks" style="width:20px;height:20px"></i>
@@ -1270,7 +1237,6 @@ body.qr-zoom-open { overflow: hidden; }
 
       <div class="modal-body">
         <ol class="divide-y divide-slate-100">
-          <!-- Step 1 -->
           <li class="flex gap-4 px-5 py-4 sm:px-6">
             <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white" aria-hidden="true">1</span>
             <div>
@@ -1283,7 +1249,6 @@ body.qr-zoom-open { overflow: hidden; }
             </div>
           </li>
 
-          <!-- Step 2 -->
           <li class="flex gap-4 px-5 py-4 sm:px-6">
             <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white" aria-hidden="true">2</span>
             <div>
@@ -1296,7 +1261,6 @@ body.qr-zoom-open { overflow: hidden; }
             </div>
           </li>
 
-          <!-- Step 3 -->
           <li class="flex gap-4 px-5 py-4 sm:px-6">
             <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white" aria-hidden="true">3</span>
             <div>
@@ -1309,7 +1273,6 @@ body.qr-zoom-open { overflow: hidden; }
             </div>
           </li>
 
-          <!-- Step 4 -->
           <li class="flex gap-4 px-5 py-4 sm:px-6">
             <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white" aria-hidden="true">4</span>
             <div>
@@ -1322,7 +1285,6 @@ body.qr-zoom-open { overflow: hidden; }
             </div>
           </li>
 
-          <!-- Step 5 -->
           <li class="flex gap-4 px-5 py-4 sm:px-6">
             <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white" aria-hidden="true">5</span>
             <div>
@@ -1343,7 +1305,6 @@ body.qr-zoom-open { overflow: hidden; }
           </p>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -1352,7 +1313,6 @@ body.qr-zoom-open { overflow: hidden; }
        aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-desc"
        aria-hidden="true">
     <div class="modal-panel" role="document" style="max-width: 460px;">
-
       <div class="flex items-start gap-3 border-b border-rose-100 bg-rose-50 px-5 py-4 sm:px-6">
         <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-rose-600 text-white" aria-hidden="true">
           <i data-lucide="alert-triangle" style="width:20px;height:20px"></i>
@@ -1391,7 +1351,6 @@ body.qr-zoom-open { overflow: hidden; }
           <span style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px;">Yes, Reset</span>
         </button>
       </div>
-
     </div>
   </div>
 
@@ -1444,7 +1403,73 @@ body.qr-zoom-open { overflow: hidden; }
   </div>
 </div>
 
-  <!-- Scroll to Collection Progress button (Payment Summary only) -->
+  <!-- Transaction ID modal -->
+  <div id="txn-modal" class="modal-backdrop" role="dialog" aria-modal="true"
+       aria-labelledby="txn-modal-title" aria-describedby="txn-modal-desc"
+       aria-hidden="true">
+    <div class="modal-panel" role="document" style="max-width: 480px;">
+      <div class="flex items-start gap-3 border-b border-indigo-100 bg-indigo-50 px-5 py-4 sm:px-6">
+        <div class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-indigo-600 text-white" aria-hidden="true">
+          <i data-lucide="receipt" style="width:20px;height:20px"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="txn-modal-title" class="font-bold"
+              style="color: rgb(41, 25, 107); font-weight: 700; font-size: 18px;">
+            Confirm payment received
+          </h3>
+          <p id="txn-modal-desc" class="mt-0.5 text-sm" style="color: rgb(72, 38, 176); font-weight: 400;">
+            Enter the UPI transaction ID to mark this payment as collected.
+          </p>
+        </div>
+        <button id="txn-modal-close" type="button"
+                class="secondary-action flex h-9 w-9 flex-none items-center justify-center rounded-full"
+                aria-label="Close transaction ID dialog">
+          <i data-lucide="x" style="width:18px;height:18px" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="modal-body px-5 py-5 sm:px-6">
+        <div class="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wider"
+             style="color: rgb(111, 106, 128); font-weight: 600; font-size: 11px; letter-spacing: 0.06rem;">
+            Payment
+          </p>
+          <p id="txn-modal-payment" class="mt-1 text-sm font-bold text-slate-900"></p>
+          <p id="txn-modal-amount" class="mt-0.5 text-lg font-bold text-indigo-700"></p>
+        </div>
+
+        <label for="txn-id-input" class="mb-2 block text-sm font-semibold"
+               style="color: rgb(48, 42, 64); font-weight: 600; font-size: 14px;">
+          Transaction ID / UTR <span class="text-rose-600">*</span>
+        </label>
+        <input id="txn-id-input" class="field-input w-full rounded-xl px-4 py-3.5 text-base"
+               type="text" autocomplete="off" spellcheck="false"
+               maxlength="40" placeholder="e.g. 4312XXXXXXXX or T1234567890"
+               aria-describedby="txn-id-help txn-id-error">
+        <p id="txn-id-help" class="mt-1.5 text-xs text-slate-500">
+          Find this in your UPI app's payment history (usually 12–24 characters).
+        </p>
+        <p id="txn-id-error" class="mt-1 text-sm font-medium text-rose-600" aria-live="polite"></p>
+      </div>
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+        <button id="txn-cancel" type="button"
+                class="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-semibold"
+                style="background: rgb(255, 255, 255); color: rgb(64, 57, 77);">
+          <span style="color: rgb(64, 57, 77); font-weight: 600; font-size: 14px;">Cancel</span>
+        </button>
+
+        <button id="txn-confirm" type="button"
+                class="primary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-semibold text-white"
+                style="background: rgb(91, 53, 204); color: rgb(255, 255, 255);">
+          <i data-lucide="check" style="width:17px;height:17px" aria-hidden="true"></i>
+          <span style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px;">Confirm Payment</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll to Collection Progress -->
   <button id="scroll-to-qr" type="button"
           class="scroll-to-qr"
           aria-label="Scroll up to Collection Progress"
@@ -1456,34 +1481,29 @@ body.qr-zoom-open { overflow: hidden; }
     (function () {
       "use strict";
 
-      // Always start the page at the top after refresh/navigation
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
 
       window.addEventListener("pageshow", () => {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: "auto"
-        });
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
       });
 
-      /* ------------------------------------------------------------------ *
-       * Constants & state
-       * ------------------------------------------------------------------ */
+      /* ---------------- Constants & state ---------------- */
 
-      const MAX_PAISE_PER_QR = 199900;   // ₹1,999.00 — UPI per-transaction cap
-      const MAX_QR_CODES = 100;          // hard safety ceiling for one batch
+      const MAX_PAISE_PER_QR = 199900;
+      const MAX_QR_CODES = 100;
       const QR_PIXEL_SIZE = 220;
 
       const state = {
-        payments: [],   // [{ paise, uri }]
-        details: null,  // { upi, name, amountPaise, note }
-        completed: []   // [Boolean] — one flag per generated QR code
+        payments: [],
+        details: null,
+        completed: [],
+        txnIds: []
       };
 
       let lastPercentShown = -1;
+      let suppressPaidChange = false;
 
       const el = {
         form: document.getElementById("payment-form"),
@@ -1513,7 +1533,6 @@ body.qr-zoom-open { overflow: hidden; }
         qrGrid: document.getElementById("qr-grid"),
         printArea: document.getElementById("print-area"),
 
-        // Progress + checklist
         progressCard: document.getElementById("progress-card"),
         progressAmount: document.getElementById("progress-amount"),
         progressTotal: document.getElementById("progress-total"),
@@ -1524,46 +1543,43 @@ body.qr-zoom-open { overflow: hidden; }
         progressChecklist: document.getElementById("progress-checklist"),
         progressClear: document.getElementById("progress-clear")
       };
+
       const confirmModal = document.getElementById("confirm-modal");
       const confirmResetBtn = document.getElementById("confirm-reset");
       const confirmCancelBtn = document.getElementById("confirm-cancel");
-      const zoomEl = document.getElementById("qr-zoom");
-const zoomQrBox = document.getElementById("qr-zoom-qr");
-const zoomStep = document.getElementById("qr-zoom-step");
-const zoomAmount = document.getElementById("qr-zoom-amount");
-const zoomMeta = document.getElementById("qr-zoom-meta");
-const zoomClose = document.getElementById("qr-zoom-close");
-const zoomPaid = document.getElementById("qr-zoom-paid");
-const zoomDownload = document.getElementById("qr-zoom-download");
-const zoomPrev = document.getElementById("qr-zoom-prev");
-const zoomNext = document.getElementById("qr-zoom-next");
-let zoomIndex = -1;
-let lastFocusedBeforeZoom = null;
 
-      /* ------------------------------------------------------------------ *
-       * Small utilities
-       * ------------------------------------------------------------------ */
+      const zoomEl = document.getElementById("qr-zoom");
+      const zoomQrBox = document.getElementById("qr-zoom-qr");
+      const zoomStep = document.getElementById("qr-zoom-step");
+      const zoomAmount = document.getElementById("qr-zoom-amount");
+      const zoomMeta = document.getElementById("qr-zoom-meta");
+      const zoomClose = document.getElementById("qr-zoom-close");
+      const zoomPaid = document.getElementById("qr-zoom-paid");
+      const zoomDownload = document.getElementById("qr-zoom-download");
+      const zoomPrev = document.getElementById("qr-zoom-prev");
+      const zoomNext = document.getElementById("qr-zoom-next");
+      let zoomIndex = -1;
+      let lastFocusedBeforeZoom = null;
+
+      /* ---------------- Utilities ---------------- */
 
       const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 
-      /** Escape user-supplied text before it is placed into innerHTML. */
       function escapeHtml(value) {
         return String(value == null ? "" : value).replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch]);
       }
 
-      /** Turn arbitrary text into a safe filename chunk. */
       function slugify(value, maxLen = 30) {
         return String(value == null ? "" : value)
           .normalize("NFKD")
-          .replace(/[^\w\s.-]/g, "")      // drop emoji, / \ : * ? " < > | etc.
+          .replace(/[^\w\s.-]/g, "")
           .trim()
-          .replace(/\s+/g, "-")           // spaces -> dashes
-          .replace(/-+/g, "-")            // collapse repeats
-          .replace(/^[-.]+|[-.]+$/g, "")  // no leading/trailing dots or dashes
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^[-.]+|[-.]+$/g, "")
           .slice(0, maxLen);
       }
 
-      /** Local timestamp like 03-10-2026_1432 (dd-mm-yyyy_hhmm) */
       function fileStamp(date = new Date()) {
         const p = (n) => String(n).padStart(2, "0");
         return (
@@ -1591,10 +1607,141 @@ let lastFocusedBeforeZoom = null;
         }).format(paise / 100);
       }
 
-      /**
-       * Parse an INR entry ("1,999", "₹1999.5", ".50") into integer paise.
-       * Returns null when the value is not a valid positive amount.
-       */
+      /* ---------------- localStorage ---------------- */
+
+const STORAGE_KEY = "collectSmarter:lastBatch";
+const HISTORY_KEY = "collectSmarter:history";   // shared with history.html
+const DRAFT_KEY = "collectSmarter:formDraft";   // unsaved form input
+const HISTORY_LIMIT = 100;
+
+let historyId = null;   // id of the record currently being edited
+
+function readHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeHistory(list) {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, HISTORY_LIMIT)));
+  } catch (error) {}
+}
+
+function newHistoryId() {
+  return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function saveToStorage() {
+  if (!state.details || !state.payments.length) return;
+
+  try {
+    const payload = {
+      historyId: historyId,
+      details: state.details,
+      payments: state.payments.map((p) => ({ paise: p.paise })),
+      completed: state.completed,
+      txnIds: state.txnIds,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {}
+
+  syncHistory();
+}
+
+function syncHistory() {
+  if (!state.details || !state.payments.length) return;
+
+  const history = readHistory();
+  const now = Date.now();
+
+  const record = {
+    id: historyId || newHistoryId(),
+    createdAt: now,
+    updatedAt: now,
+    details: {
+      upi: state.details.upi,
+      name: state.details.name,
+      amountPaise: state.details.amountPaise,
+      note: state.details.note || ""
+    },
+    payments: state.payments.map((p) => ({ paise: p.paise })),
+    completed: state.completed.slice(),
+    txnIds: state.txnIds.slice()
+  };
+
+  const index = history.findIndex((item) => item && item.id === record.id);
+
+  if (index === -1) {
+    history.unshift(record);                       // brand-new batch
+  } else {
+    record.createdAt = Number(history[index].createdAt) || now;
+    history[index] = record;                       // update existing batch
+  }
+
+  historyId = record.id;
+  writeHistory(history);
+}
+
+      /* ---------------- Draft (unsaved input) ---------------- */
+
+      let draftTimer = null;
+
+      function saveDraft() {
+        if (draftTimer) clearTimeout(draftTimer);
+        draftTimer = setTimeout(() => {
+          try {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify({
+              upi: el.upi.value,
+              name: el.name.value,
+              amount: el.amount.value,
+              note: el.note.value
+            }));
+          } catch (error) {}
+        }, 250);
+      }
+
+      function loadDraft() {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) return null;
+          const data = JSON.parse(raw);
+          if (!data || typeof data !== "object") return null;
+          return data;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function clearDraft() {
+        try { localStorage.removeItem(DRAFT_KEY); } catch (error) {}
+      }
+
+      function loadFromStorage() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return null;
+          const data = JSON.parse(raw);
+          if (!data || !data.details || !Array.isArray(data.payments) || !data.payments.length) {
+            return null;
+          }
+          return data;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function clearStorage() {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (error) {}
+      }
+
+      /* ---------------- Amount parsing / splitting ---------------- */
+
       function parseAmount(value) {
         const cleaned = String(value == null ? "" : value)
           .trim()
@@ -1608,7 +1755,6 @@ let lastFocusedBeforeZoom = null;
         return Number.isSafeInteger(paise) && paise > 0 ? paise : null;
       }
 
-      /** Split a total into portions no larger than the per-QR UPI cap. */
       function splitAmount(totalPaise) {
         const splits = [];
         let remaining = totalPaise;
@@ -1635,9 +1781,7 @@ let lastFocusedBeforeZoom = null;
         return "upi://pay?" + params.toString();
       }
 
-      /* ------------------------------------------------------------------ *
-       * Validation
-       * ------------------------------------------------------------------ */
+      /* ---------------- Validation ---------------- */
 
       function setError(fieldId, message) {
         const input = document.getElementById(fieldId);
@@ -1701,9 +1845,7 @@ let lastFocusedBeforeZoom = null;
         };
       }
 
-      /* ------------------------------------------------------------------ *
-       * Tabs
-       * ------------------------------------------------------------------ */
+      /* ---------------- Tabs ---------------- */
 
       function switchTab(tabName) {
         const detailsActive = tabName === "details";
@@ -1720,25 +1862,17 @@ let lastFocusedBeforeZoom = null;
         el.detailsTab.tabIndex = detailsActive ? 0 : -1;
         el.summaryTab.tabIndex = detailsActive ? -1 : 0;
 
-        const visiblePanel = detailsActive
-          ? el.detailsPanel
-          : el.summaryPanel;
+        const visiblePanel = detailsActive ? el.detailsPanel : el.summaryPanel;
 
         visiblePanel.classList.remove("panel-enter");
         void visiblePanel.offsetWidth;
         visiblePanel.classList.add("panel-enter");
 
-        // Scroll the dashboard back to the top when switching tabs
         requestAnimationFrame(() => {
           const dashboard = document.querySelector(".dashboard-card");
-
           if (dashboard) {
             const top = dashboard.getBoundingClientRect().top + window.scrollY;
-
-            window.scrollTo({
-              top: Math.max(0, top - 16),
-              behavior: "smooth"
-            });
+            window.scrollTo({ top: Math.max(0, top - 16), behavior: "smooth" });
             updateScrollButton();
           }
         });
@@ -1765,15 +1899,12 @@ let lastFocusedBeforeZoom = null;
         switchTab(next === 0 ? "details" : "summary");
       }
 
-      /* ------------------------------------------------------------------ *
-       * QR rendering
-       * ------------------------------------------------------------------ */
+      /* ---------------- QR rendering ---------------- */
 
       function qrWrap(index) {
         return document.getElementById("qr-" + index);
       }
 
-      /** qrcodejs may leave behind a <canvas> or replace it with an <img>. */
       function qrSourceNode(index) {
         const wrap = qrWrap(index);
         return wrap ? wrap.querySelector("canvas, img") : null;
@@ -1855,22 +1986,24 @@ let lastFocusedBeforeZoom = null;
                 "Download PNG" +
               "</button>" +
 
-              /* ---- Payment checklist toggle ---- */
               '<label class="paid-toggle' + (isPaid ? " is-paid" : "") + '" data-index="' + index + '">' +
                 '<input type="checkbox" class="paid-checkbox" data-index="' + index + '"' +
                   (isPaid ? " checked" : "") +
                   ' aria-label="Mark payment ' + stepNumber + ' as paid">' +
                 '<span class="paid-toggle-box" aria-hidden="true">' + TOGGLE_CHECK_SVG + "</span>" +
-                '<span class="paid-toggle-text">' +
-                  (isPaid ? "Payment " + stepNumber + " collected" : "Mark payment " + stepNumber + " as paid") +
-                "</span>" +
-              "</label>" +
-            "</div>";
+'<span class="paid-toggle-text">' +
+  (isPaid ? "Payment " + stepNumber + " collected" : "Mark payment " + stepNumber + " as paid") +
+"</span>" +
+"</label>" +
+(state.txnIds[index]
+  ? '<p class="txn-display mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800" data-index="' + index + '">Txn ID: ' +
+      escapeHtml(state.txnIds[index]) + "</p>"
+  : "") +
+"</div>";
 
           el.qrGrid.appendChild(card);
         });
 
-        // Render each QR, collecting failures instead of aborting the batch.
         const failures = [];
 
         state.payments.forEach((payment, index) => {
@@ -1899,9 +2032,7 @@ let lastFocusedBeforeZoom = null;
         return failures;
       }
 
-      /* ------------------------------------------------------------------ *
-       * Collection progress + checklist
-       * ------------------------------------------------------------------ */
+      /* ---------------- Progress + checklist ---------------- */
 
       function buildChecklistPills() {
         el.progressChecklist.innerHTML = state.payments
@@ -1943,7 +2074,6 @@ let lastFocusedBeforeZoom = null;
           : 0;
         const isComplete = totalCount > 0 && doneCount === totalCount;
 
-        // Values
         el.progressAmount.textContent = formatINR(collectedPaise);
         el.progressTotal.textContent = formatINR(totalPaise);
         el.progressPercent.textContent = percent + "%";
@@ -1952,7 +2082,6 @@ let lastFocusedBeforeZoom = null;
           ? "All " + totalCount + " payments collected 🎉"
           : doneCount + " of " + totalCount + " payments completed";
 
-        // Bar
         el.progressFill.style.width = percent + "%";
         el.progressTrack.setAttribute("aria-valuenow", String(percent));
         el.progressTrack.setAttribute(
@@ -1963,7 +2092,6 @@ let lastFocusedBeforeZoom = null;
         el.progressCard.classList.toggle("is-complete", isComplete);
         el.progressClear.classList.toggle("hidden", doneCount === 0);
 
-        // Checklist pills
         if (el.progressChecklist.childElementCount !== totalCount) {
           buildChecklistPills();
         }
@@ -1971,7 +2099,6 @@ let lastFocusedBeforeZoom = null;
           pill.classList.toggle("is-done", Boolean(state.completed[index]));
         });
 
-        // Pop the percentage only when it actually changes
         if (percent !== lastPercentShown) {
           el.progressPercent.classList.remove("pop-in");
           void el.progressPercent.offsetWidth;
@@ -1980,7 +2107,6 @@ let lastFocusedBeforeZoom = null;
         }
       }
 
-      /** Update a single card's paid visuals without a full re-render. */
       function paintCardPaidState(box) {
         const index = Number(box.dataset.index);
         const checked = box.checked;
@@ -2004,121 +2130,278 @@ let lastFocusedBeforeZoom = null;
         }
       }
 
-      /* ------------------------------------------------------------------ *
- * Full-screen QR viewer
- * ------------------------------------------------------------------ */
+      /* ---------------- Transaction ID modal ---------------- */
 
-function openQrZoom(index, options) {
-  if (!state.payments[index]) return;
+      const txnModal = document.getElementById("txn-modal");
+      const txnModalClose = document.getElementById("txn-modal-close");
+      const txnCancel = document.getElementById("txn-cancel");
+      const txnConfirm = document.getElementById("txn-confirm");
+      const txnIdInput = document.getElementById("txn-id-input");
+      const txnIdError = document.getElementById("txn-id-error");
+      const txnModalPayment = document.getElementById("txn-modal-payment");
+      const txnModalAmount = document.getElementById("txn-modal-amount");
 
-  const opts = options || {};
-  const isStep = Boolean(opts.step);   // true when called from prev/next
+      let pendingTxnIndex = -1;
+      let pendingTxnSource = null;
+      let lastFocusedBeforeTxn = null;
 
-  zoomIndex = index;
+      function setTxnError(message) {
+        txnIdInput.classList.toggle("is-invalid", Boolean(message));
+        txnIdInput.setAttribute("aria-invalid", String(Boolean(message)));
+        txnIdError.textContent = message || "";
+      }
 
-  // Remember the original trigger ONLY on the first open.
-  // Stepping (prev/next) must not overwrite it, or focus-return breaks.
-  if (!isStep) {
-    lastFocusedBeforeZoom = document.activeElement;
-  }
+      function openTxnModal(index, source) {
+        if (!state.payments[index]) return;
+        if (state.completed[index]) return;
 
-  const total = state.payments.length;
-  const isSplit = total > 1;
-  const stepNumber = index + 1;
+        pendingTxnIndex = index;
+        pendingTxnSource = source;
 
-  zoomStep.textContent = isSplit
-    ? "Step " + stepNumber + " of " + total
-    : "UPI Payment";
-  zoomAmount.textContent = formatINR(state.payments[index].paise);
-  zoomMeta.innerHTML =
-    "<strong>" + escapeHtml(state.details.name) + "</strong><br>" +
-    escapeHtml(state.details.upi) +
-    (state.details.note
-      ? '<br><em>"' + escapeHtml(state.details.note) + '"</em>'
-      : "");
+        const total = state.payments.length;
+        const stepNumber = index + 1;
+        const isSplit = total > 1;
 
-  const dataUrl = qrDataUrl(index);
-  zoomQrBox.innerHTML = "";
-  if (dataUrl) {
-    const img = document.createElement("img");
-    img.src = dataUrl;
-    img.alt = "Enlarged UPI QR code for payment " + stepNumber;
-    img.decoding = "sync";
-    img.style.display = "block";
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "contain";
-    zoomQrBox.appendChild(img);
-  } else {
-    zoomQrBox.innerHTML =
-      '<p style="color:#d43f5e;font-size:14px;font-weight:600;text-align:center">' +
-      "QR image unavailable. Please regenerate.</p>";
-  }
+        txnModalPayment.textContent = isSplit
+          ? "Payment " + stepNumber + " of " + total
+          : "Single payment";
+        txnModalAmount.textContent = formatINR(state.payments[index].paise);
 
-  // Reflect paid state on the button
-  const isPaid = Boolean(state.completed[index]);
-  if (zoomPaid) {
-    zoomPaid.classList.toggle("is-paid", isPaid);
-    zoomPaid.setAttribute("aria-pressed", String(isPaid));
-    const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
-    if (paidText) {
-      paidText.textContent = isPaid ? "Paid (tap to undo)" : "Mark as paid";
-    }
-  }
+        txnIdInput.value = state.txnIds[index] || "";
+        setTxnError("");
 
-  // Show nav buttons only when there is more than one QR code
-  const multi = total > 1;
-  if (zoomPrev) zoomPrev.classList.toggle("is-hidden", !multi);
-  if (zoomNext) zoomNext.classList.toggle("is-hidden", !multi);
+        lastFocusedBeforeTxn = document.activeElement;
+        txnModal.classList.add("is-open");
+        txnModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
 
-  // First open: add the class + body lock + focus the close button.
-  // Stepping: only refresh the content, keep the user's focus where it is.
-  if (!isStep) {
-    zoomEl.classList.add("is-open");
-    zoomEl.setAttribute("aria-hidden", "false");
-    document.body.classList.add("qr-zoom-open");
+        if (window.lucide) window.lucide.createIcons();
+        window.requestAnimationFrame(() => txnIdInput.focus());
+      }
 
-    if (window.lucide) window.lucide.createIcons();
-    window.requestAnimationFrame(() => zoomClose.focus());
-  }
-}
+      function closeTxnModal() {
+        txnModal.classList.remove("is-open");
+        txnModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+        setTxnError("");
+        pendingTxnIndex = -1;
+        pendingTxnSource = null;
 
-function closeQrZoom() {
-  if (!zoomEl.classList.contains("is-open")) {
-  zoomIndex = -1;
-  return;
-}
+        if (lastFocusedBeforeTxn && typeof lastFocusedBeforeTxn.focus === "function") {
+          lastFocusedBeforeTxn.focus();
+        }
+        lastFocusedBeforeTxn = null;
+      }
 
-  zoomEl.classList.remove("is-open");
-  zoomEl.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("qr-zoom-open");
+      function commitTxn() {
+        const value = txnIdInput.value.trim();
 
-  // Clear cloned QR to free memory
-  setTimeout(() => { if (!zoomEl.classList.contains("is-open")) zoomQrBox.innerHTML = ""; }, 320);
+        if (!value) {
+          setTxnError("Please enter the transaction ID to confirm this payment.");
+          txnIdInput.focus();
+          return;
+        }
+        if (value.length < 6) {
+          setTxnError("Transaction ID looks too short. Please check and re-enter.");
+          txnIdInput.focus();
+          return;
+        }
 
-  if (lastFocusedBeforeZoom && typeof lastFocusedBeforeZoom.focus === "function") {
-    lastFocusedBeforeZoom.focus();
-  }
-  lastFocusedBeforeZoom = null;
-  zoomIndex = -1;
-}
+        const index = pendingTxnIndex;
+        if (index < 0) { closeTxnModal(); return; }
 
-/**
- * Move to the previous / next QR code while the overlay is open.
- * Wraps around so you can cycle endlessly.
- */
-function stepQrZoom(direction) {
-  if (zoomIndex < 0) return;
-  const total = state.payments.length;
-  if (total < 2) return;
+        state.txnIds[index] = value;
+        state.completed[index] = true;
 
-  const next = (zoomIndex + direction + total) % total;
-  openQrZoom(next, { step: true });
-}
+        suppressPaidChange = true;
+        const box = el.qrGrid.querySelector('.paid-checkbox[data-index="' + index + '"]');
+        if (box) {
+          box.checked = true;
+          paintCardPaidState(box);
+        }
+        suppressPaidChange = false;
 
-      /* ------------------------------------------------------------------ *
-       * Summary
-       * ------------------------------------------------------------------ */
+        updateCardTxnDisplay(index, value);
+        renderProgress();
+        saveToStorage();
+
+        if (pendingTxnSource === "zoom" && zoomIndex === index) {
+          zoomPaid.classList.add("is-paid");
+          zoomPaid.setAttribute("aria-pressed", "true");
+          const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
+          if (paidText) paidText.textContent = "Paid (tap to undo)";
+        }
+
+        closeTxnModal();
+      }
+
+      function updateCardTxnDisplay(index, txnId) {
+        const card = el.qrGrid.querySelector('.paid-toggle[data-index="' + index + '"]');
+        if (!card) return;
+
+        let display = card.parentElement.querySelector('.txn-display[data-index="' + index + '"]');
+        if (!display) {
+          display = document.createElement("p");
+          display.className = "txn-display mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800";
+          display.dataset.index = String(index);
+          card.parentElement.insertBefore(display, card.nextSibling);
+        }
+        display.textContent = "Txn ID: " + txnId;
+      }
+
+      function removeCardTxnDisplay(index) {
+        const display = el.qrGrid.querySelector('.txn-display[data-index="' + index + '"]');
+        if (display) display.remove();
+      }
+
+      if (txnModalClose) txnModalClose.addEventListener("click", closeTxnModal);
+      if (txnCancel) txnCancel.addEventListener("click", closeTxnModal);
+      if (txnConfirm) txnConfirm.addEventListener("click", commitTxn);
+
+      if (txnIdInput) {
+        txnIdInput.addEventListener("input", () => {
+          if (txnIdInput.classList.contains("is-invalid")) setTxnError("");
+        });
+        txnIdInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            commitTxn();
+          }
+        });
+      }
+
+      if (txnModal) {
+        txnModal.addEventListener("click", (event) => {
+          if (event.target === txnModal) closeTxnModal();
+        });
+
+        txnModal.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();  // ← BUG FIX: prevent global Escape from also closing zoom
+            closeTxnModal();
+            return;
+          }
+          if (event.key !== "Tab") return;
+
+          const focusables = txnModal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (!focusables.length) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          const active = document.activeElement;
+
+          if (event.shiftKey && active === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && active === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        });
+      }
+
+      /* ---------------- Full-screen QR viewer ---------------- */
+
+      function openQrZoom(index, options) {
+        if (!state.payments[index]) return;
+
+        const opts = options || {};
+        const isStep = Boolean(opts.step);
+
+        zoomIndex = index;
+
+        if (!isStep) {
+          lastFocusedBeforeZoom = document.activeElement;
+        }
+
+        const total = state.payments.length;
+        const isSplit = total > 1;
+        const stepNumber = index + 1;
+
+        zoomStep.textContent = isSplit
+          ? "Step " + stepNumber + " of " + total
+          : "UPI Payment";
+        zoomAmount.textContent = formatINR(state.payments[index].paise);
+        zoomMeta.innerHTML =
+          "<strong>" + escapeHtml(state.details.name) + "</strong><br>" +
+          escapeHtml(state.details.upi) +
+          (state.details.note
+            ? '<br><em>"' + escapeHtml(state.details.note) + '"</em>'
+            : "");
+
+        const dataUrl = qrDataUrl(index);
+        zoomQrBox.innerHTML = "";
+        if (dataUrl) {
+          const img = document.createElement("img");
+          img.src = dataUrl;
+          img.alt = "Enlarged UPI QR code for payment " + stepNumber;
+          img.decoding = "sync";
+          img.style.display = "block";
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = "contain";
+          zoomQrBox.appendChild(img);
+        } else {
+          zoomQrBox.innerHTML =
+            '<p style="color:#d43f5e;font-size:14px;font-weight:600;text-align:center">' +
+            "QR image unavailable. Please regenerate.</p>";
+        }
+
+        const isPaid = Boolean(state.completed[index]);
+        if (zoomPaid) {
+          zoomPaid.classList.toggle("is-paid", isPaid);
+          zoomPaid.setAttribute("aria-pressed", String(isPaid));
+          const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
+          if (paidText) {
+            paidText.textContent = isPaid ? "Paid (tap to undo)" : "Mark as paid";
+          }
+        }
+
+        const multi = total > 1;
+        if (zoomPrev) zoomPrev.classList.toggle("is-hidden", !multi);
+        if (zoomNext) zoomNext.classList.toggle("is-hidden", !multi);
+
+        if (!isStep) {
+          zoomEl.classList.add("is-open");
+          zoomEl.setAttribute("aria-hidden", "false");
+          document.body.classList.add("qr-zoom-open");
+
+          if (window.lucide) window.lucide.createIcons();
+          window.requestAnimationFrame(() => zoomClose.focus());
+        }
+      }
+
+      function closeQrZoom() {
+        if (!zoomEl.classList.contains("is-open")) {
+          zoomIndex = -1;
+          return;
+        }
+
+        zoomEl.classList.remove("is-open");
+        zoomEl.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("qr-zoom-open");
+
+        setTimeout(() => { if (!zoomEl.classList.contains("is-open")) zoomQrBox.innerHTML = ""; }, 320);
+
+        if (lastFocusedBeforeZoom && typeof lastFocusedBeforeZoom.focus === "function") {
+          lastFocusedBeforeZoom.focus();
+        }
+        lastFocusedBeforeZoom = null;
+        zoomIndex = -1;
+      }
+
+      function stepQrZoom(direction) {
+        if (zoomIndex < 0) return;
+        const total = state.payments.length;
+        if (total < 2) return;
+
+        const next = (zoomIndex + direction + total) % total;
+        openQrZoom(next, { step: true });
+      }
+
+      /* ---------------- Summary ---------------- */
 
       function renderSummary() {
         const hasPayments = state.payments.length > 0 && Boolean(state.details);
@@ -2146,7 +2429,6 @@ function stepQrZoom(direction) {
         el.noteRow.classList.toggle("hidden", !details.note);
         el.noteValue.textContent = details.note;
 
-        // Tailor the step-4 hint to the number of QR codes
         const repeatHint = document.getElementById("repeat-hint");
         if (repeatHint) {
           if (count === 1) {
@@ -2165,14 +2447,8 @@ function stepQrZoom(direction) {
         return failures;
       }
 
-      /* ------------------------------------------------------------------ *
-       * Download & print
-       * ------------------------------------------------------------------ */
+      /* ---------------- Download & print ---------------- */
 
-      /**
-       * Build a shareable PNG that shows the QR together with the payment
-       * details, so a downloaded image is self-explanatory on its own.
-       */
       function buildQrCardCanvas(index) {
         const source = qrSourceNode(index);
         if (!source) return null;
@@ -2183,7 +2459,7 @@ function stepQrZoom(direction) {
         const isSplit = total > 1;
         const stepNumber = index + 1;
 
-        const dpr = 2;                     // render at 2x for crisp text
+        const dpr = 2;
         const width = 560;
         const pad = 40;
         const qrSize = width - pad * 2;
@@ -2197,15 +2473,12 @@ function stepQrZoom(direction) {
         const ctx = canvas.getContext("2d");
         ctx.scale(dpr, dpr);
 
-        // Background
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, width, height);
 
-        // Accent bar
         ctx.fillStyle = "#5b35cc";
         ctx.fillRect(0, 0, width, 8);
 
-        // ---- Brand row (top-left) ----
         const badgeX = pad;
         const badgeY = 26;
         const badgeSize = 26;
@@ -2252,7 +2525,6 @@ function stepQrZoom(direction) {
         ctx.textAlign = "center";
         ctx.textBaseline = "alphabetic";
 
-        // ---- Header ----
         let y = 84;
 
         ctx.fillStyle = "#5b35cc";
@@ -2275,7 +2547,6 @@ function stepQrZoom(direction) {
           ctx.fillText("Part " + stepNumber + " of a " + total + "-part split", width / 2, y);
         }
 
-        // ---- QR code ----
         const qrTop = headerH;
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(pad, qrTop, qrSize, qrSize);
@@ -2290,7 +2561,6 @@ function stepQrZoom(direction) {
         ctx.lineWidth = 1;
         ctx.strokeRect(pad + 0.5, qrTop + 0.5, qrSize - 1, qrSize - 1);
 
-        // ---- Footer ----
         const footerTop = qrTop + qrSize;
         ctx.strokeStyle = "#e6e3ed";
         ctx.beginPath();
@@ -2340,7 +2610,6 @@ function stepQrZoom(direction) {
         const total = payments.length;
         const isSplit = total > 1;
 
-        // ₹1999.00 -> "1999" | ₹1999.50 -> "1999.50"
         const rupees = payments[index].paise / 100;
         const amountLabel = Number.isInteger(rupees)
           ? String(rupees)
@@ -2348,23 +2617,18 @@ function stepQrZoom(direction) {
 
         const parts = ["COLLECT SMARTER", "upi"];
 
-        // who is collecting (first token of the name keeps it short)
         const nameSlug = slugify(details.name.split(/\s+/)[0], 18);
         if (nameSlug) parts.push(nameSlug);
 
-        // amount
         parts.push("Rs" + amountLabel);
 
-        // step marker only when there's more than one QR
         if (isSplit) parts.push("part" + String(index + 1).padStart(2, "0") + "of" + total);
 
-        // optional note
         if (details.note) {
           const noteSlug = slugify(details.note, 24);
           if (noteSlug) parts.push(noteSlug);
         }
 
-        // date stamp so repeat batches never collide
         parts.push(fileStamp());
 
         const fileName = parts.join("_") + ".png";
@@ -2390,101 +2654,97 @@ function stepQrZoom(direction) {
         }
       }
 
-function buildPrintArea() {
-  const { details, payments } = state;
-  const total = payments.length;
-  const isSplit = total > 1;
-  const printedOn = new Date();
+      function buildPrintArea() {
+        const { details, payments } = state;
+        const total = payments.length;
+        const isSplit = total > 1;
+        const printedOn = new Date();
 
-  const cards = payments.map((payment, index) => {
-    const dataUrl = qrDataUrl(index);
-    const stepNumber = index + 1;
+        const cards = payments.map((payment, index) => {
+          const dataUrl = qrDataUrl(index);
+          const stepNumber = index + 1;
 
-    const hint = isSplit
-      ? "Payment " + stepNumber + " of " + total + " — scan this " +
-        (stepNumber === 1 ? "first" : stepNumber === total ? "last" : "next")
-      : "Full payment in one scan";
+          const hint = isSplit
+            ? "Payment " + stepNumber + " of " + total + " — scan this " +
+              (stepNumber === 1 ? "first" : stepNumber === total ? "last" : "next")
+            : "Full payment in one scan";
 
-    return (
-      '<article class="print-card">' +
-        '<div class="step-badge">' +
-          (isSplit ? "Step " + stepNumber + " of " + total : "UPI PAYMENT") +
-        "</div>" +
-        '<p class="print-amount">' + escapeHtml(formatINR(payment.paise)) + "</p>" +
-        (dataUrl
-          ? '<img src="' + dataUrl + '" alt="UPI QR code for payment ' + stepNumber + '">'
-          : '<p class="qr-note" style="color:#b91c3c">QR image not available</p>') +
-        '<p class="qr-note">' + escapeHtml(hint) + "</p>" +
-        '<div class="divider"></div>' +
-        '<p class="upi-line">' + escapeHtml(details.upi) + "</p>" +
-        '<p class="account-line">' + escapeHtml(details.name) + "</p>" +
-        (details.note
-          ? '<p class="qr-note" style="margin-top:6px"><em>"' + escapeHtml(details.note) + '"</em></p>'
-          : "") +
-      "</article>"
-    );
-  }).join("");
+          return (
+            '<article class="print-card">' +
+              '<div class="step-badge">' +
+                (isSplit ? "Step " + stepNumber + " of " + total : "UPI PAYMENT") +
+              "</div>" +
+              '<p class="print-amount">' + escapeHtml(formatINR(payment.paise)) + "</p>" +
+              (dataUrl
+                ? '<img src="' + dataUrl + '" alt="UPI QR code for payment ' + stepNumber + '">'
+                : '<p class="qr-note" style="color:#b91c3c">QR image not available</p>') +
+              '<p class="qr-note">' + escapeHtml(hint) + "</p>" +
+              '<div class="divider"></div>' +
+              '<p class="upi-line">' + escapeHtml(details.upi) + "</p>" +
+              '<p class="account-line">' + escapeHtml(details.name) + "</p>" +
+              (details.note
+                ? '<p class="qr-note" style="margin-top:6px"><em>"' + escapeHtml(details.note) + '"</em></p>'
+                : "") +
+            "</article>"
+          );
+        }).join("");
 
-  const printedOnText =
-    String(printedOn.getDate()).padStart(2, "0") + "-" +
-    String(printedOn.getMonth() + 1).padStart(2, "0") + "-" +
-    printedOn.getFullYear() + " " +
-    String(printedOn.getHours()).padStart(2, "0") + ":" +
-    String(printedOn.getMinutes()).padStart(2, "0");
+        const printedOnText =
+          String(printedOn.getDate()).padStart(2, "0") + "-" +
+          String(printedOn.getMonth() + 1).padStart(2, "0") + "-" +
+          printedOn.getFullYear() + " " +
+          String(printedOn.getHours()).padStart(2, "0") + ":" +
+          String(printedOn.getMinutes()).padStart(2, "0");
 
-  el.printArea.innerHTML =
-    '<header class="print-head">' +
-      '<div class="brand-row">' +
-        '<span class="brand-badge">QR</span>' +
-        '<span class="brand-text">Collect Smarter</span>' +
-      "</div>" +
-      "<h1>UPI Payment QR Codes</h1>" +
-      '<div class="meta-grid">' +
-        "<p><strong>Account Holder:</strong> " + escapeHtml(details.name) + "</p>" +
-        "<p><strong>UPI ID:</strong> " + escapeHtml(details.upi) + "</p>" +
-        "<p><strong>Total to Collect:</strong> " + escapeHtml(formatINR(details.amountPaise)) + "</p>" +
-        "<p><strong>QR Codes:</strong> " + total + (total === 1 ? " code" : " codes") + "</p>" +
-        (details.note
-          ? "<p><strong>Note:</strong> " + escapeHtml(details.note) + "</p>"
-          : "") +
-        "<p><strong>Printed on:</strong> " + escapeHtml(printedOnText) + "</p>" +
-      "</div>" +
-    "</header>" +
-    '<div class="print-grid">' + cards + "</div>" +
-    '<footer class="print-foot">' +
-      "<p><strong>Important:</strong> Each QR code is valid for a single payment. " +
-      "Confirm the amount on the payer's screen before they enter their UPI PIN.</p>" +
-      "<p style='margin-top:4px'>Generated by Collect Smarter · UPI QR Code Generator</p>" +
-      "<p style='margin-top:4px'>Developed By ~ Shankar Prasad Pyke </p>" +
-    "</footer>";
-}
+        el.printArea.innerHTML =
+          '<header class="print-head">' +
+            '<div class="brand-row">' +
+              '<span class="brand-badge">QR</span>' +
+              '<span class="brand-text">Collect Smarter</span>' +
+            "</div>" +
+            "<h1>UPI Payment QR Codes</h1>" +
+            '<div class="meta-grid">' +
+              "<p><strong>Account Holder:</strong> " + escapeHtml(details.name) + "</p>" +
+              "<p><strong>UPI ID:</strong> " + escapeHtml(details.upi) + "</p>" +
+              "<p><strong>Total to Collect:</strong> " + escapeHtml(formatINR(details.amountPaise)) + "</p>" +
+              "<p><strong>QR Codes:</strong> " + total + (total === 1 ? " code" : " codes") + "</p>" +
+              (details.note
+                ? "<p><strong>Note:</strong> " + escapeHtml(details.note) + "</p>"
+                : "") +
+              "<p><strong>Printed on:</strong> " + escapeHtml(printedOnText) + "</p>" +
+            "</div>" +
+          "</header>" +
+          '<div class="print-grid">' + cards + "</div>" +
+          '<footer class="print-foot">' +
+            "<p><strong>Important:</strong> Each QR code is valid for a single payment. " +
+            "Confirm the amount on the payer's screen before they enter their UPI PIN.</p>" +
+            "<p style='margin-top:4px'>Generated by Collect Smarter · UPI QR Code Generator</p>" +
+            "<p style='margin-top:4px'>Developed By ~ Shankar Prasad Pyke </p>" +
+          "</footer>";
+      }
 
-function printAll() {
-  if (!state.payments.length) return;
+      function printAll() {
+        if (!state.payments.length) return;
 
-  buildPrintArea();
+        buildPrintArea();
 
-  // Give the printed PDF a meaningful filename
-  const originalTitle = document.title;
-  const firstWord = state.details.name.split(/\s+/)[0] || "payment";
-  const printedOn = fileStamp(); // reuse your dd-mm-yyyy_hhmm helper
-  document.title = "UPI-QR_" + firstWord + "_" + printedOn;
+        const originalTitle = document.title;
+        const firstWord = state.details.name.split(/\s+/)[0] || "payment";
+        const printedOn = fileStamp();
+        document.title = "UPI-QR_" + firstWord + "_" + printedOn;
 
-  const images = Array.from(el.printArea.querySelectorAll("img"));
-  const ready = images.map((img) =>
-    typeof img.decode === "function" ? img.decode().catch(() => {}) : Promise.resolve()
-  );
+        const images = Array.from(el.printArea.querySelectorAll("img"));
+        const ready = images.map((img) =>
+          typeof img.decode === "function" ? img.decode().catch(() => {}) : Promise.resolve()
+        );
 
-  Promise.all(ready).then(() => {
-    window.print();
-    // Restore title after the dialog closes
-    setTimeout(() => { document.title = originalTitle; }, 0);
-  });
-}
+        Promise.all(ready).then(() => {
+          window.print();
+          setTimeout(() => { document.title = originalTitle; }, 0);
+        });
+      }
 
-      /* ------------------------------------------------------------------ *
-       * Reset
-       * ------------------------------------------------------------------ */
+      /* ---------------- Reset ---------------- */
 
       function resetApp() {
         closeQrZoom();
@@ -2496,7 +2756,12 @@ function printAll() {
         state.payments = [];
         state.details = null;
         state.completed = [];
+        state.txnIds = [];
+        historyId = null;
         lastPercentShown = -1;
+
+        clearStorage();
+        clearDraft();
 
         el.qrGrid.innerHTML = "";
         el.printArea.innerHTML = "";
@@ -2509,9 +2774,7 @@ function printAll() {
         switchTab("details");
       }
 
-      /* ------------------------------------------------------------------ *
-       * QR library loading (fallback if the CDN <script> failed)
-       * ------------------------------------------------------------------ */
+      /* ---------------- QR library loader ---------------- */
 
       function ensureQrLibrary() {
         if (window.QRCode) return Promise.resolve(true);
@@ -2534,9 +2797,7 @@ function printAll() {
         });
       }
 
-      /* ------------------------------------------------------------------ *
-       * Live previews
-       * ------------------------------------------------------------------ */
+      /* ---------------- Live previews ---------------- */
 
       function updateAmountPreview() {
         const raw = el.amount.value.trim();
@@ -2561,9 +2822,7 @@ function printAll() {
         }
       }
 
-      /* ------------------------------------------------------------------ *
-       * Event wiring
-       * ------------------------------------------------------------------ */
+      /* ---------------- Event wiring ---------------- */
 
       el.form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -2590,11 +2849,14 @@ function printAll() {
             uri: buildUpiUri(result.details, paise)
           }));
           state.completed = new Array(state.payments.length).fill(false);
+          state.txnIds = new Array(state.payments.length).fill("");
           lastPercentShown = -1;
+          historyId = null;
+          saveToStorage();
+          clearDraft();
 
           const failures = renderSummary();
 
-          // Give the browser one frame to paint before checking the output.
           await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
           const missing = state.payments
@@ -2616,6 +2878,7 @@ function printAll() {
           state.payments = [];
           state.details = null;
           state.completed = [];
+          state.txnIds = [];
           el.qrGrid.innerHTML = "";
           renderSummary();
           setStatus(
@@ -2637,26 +2900,34 @@ function printAll() {
           state.payments.length > 0 ||
           state.details !== null;
 
-        if (!hasData) return;   // nothing to reset — no-op
+        if (!hasData) return;
         openConfirmModal();
       });
+
       document.getElementById("back-button").addEventListener("click", () => switchTab("details"));
       document.getElementById("print-button").addEventListener("click", printAll);
 
-      /* ------------------------------------------------------------------ *
-       * Checklist interactions
-       * ------------------------------------------------------------------ */
+      /* ---------------- Checklist interactions ---------------- */
 
       el.qrGrid.addEventListener("change", (event) => {
+        if (suppressPaidChange) return;
         const box = event.target.closest(".paid-checkbox");
         if (!box) return;
 
         const index = Number(box.dataset.index);
         if (!Number.isInteger(index) || index < 0 || index >= state.payments.length) return;
 
-        state.completed[index] = box.checked;
-        paintCardPaidState(box);
-        renderProgress();
+        if (box.checked) {
+          box.checked = false;
+          openTxnModal(index, "card");
+        } else {
+          state.completed[index] = false;
+          state.txnIds[index] = "";
+          removeCardTxnDisplay(index);
+          paintCardPaidState(box);
+          renderProgress();
+          saveToStorage();
+        }
       });
 
       if (el.progressClear) {
@@ -2664,19 +2935,21 @@ function printAll() {
           if (!state.payments.length) return;
 
           state.completed = new Array(state.payments.length).fill(false);
+          state.txnIds = new Array(state.payments.length).fill("");
 
           el.qrGrid.querySelectorAll(".paid-checkbox").forEach((box) => {
             box.checked = false;
             paintCardPaidState(box);
           });
 
+          el.qrGrid.querySelectorAll(".txn-display").forEach((node) => node.remove());
+
           renderProgress();
+          saveToStorage();
         });
       }
 
-      /* ------------------------------------------------------------------ *
-       * Info modal
-       * ------------------------------------------------------------------ */
+      /* ---------------- Info modal ---------------- */
 
       const infoModal = document.getElementById("info-modal");
       const infoModalClose = document.getElementById("info-modal-close");
@@ -2734,9 +3007,7 @@ function printAll() {
         }
       });
 
-      /* ------------------------------------------------------------------ *
-       * Confirm reset modal
-       * ------------------------------------------------------------------ */
+      /* ---------------- Confirm reset modal ---------------- */
 
       let lastFocusedBeforeConfirm = null;
 
@@ -2762,7 +3033,6 @@ function printAll() {
         const trigger = lastFocusedBeforeConfirm;
         confirmModal.classList.remove("is-open");
 
-        // Wait for the fade-out to finish before mutating the page.
         const finish = () => {
           confirmModal.setAttribute("aria-hidden", "true");
           document.body.classList.remove("modal-open");
@@ -2774,7 +3044,7 @@ function printAll() {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           finish();
         } else {
-          setTimeout(finish, 300); // matches .28s transition
+          setTimeout(finish, 300);
         }
       });
 
@@ -2815,30 +3085,29 @@ function printAll() {
       el.detailsTab.addEventListener("keydown", handleTabKeys);
       el.summaryTab.addEventListener("keydown", handleTabKeys);
 
-el.qrGrid.addEventListener("click", (event) => {
-  const downloadBtn = event.target.closest(".download-button");
-  if (downloadBtn) {
-    downloadQrPng(Number(downloadBtn.dataset.index));
-    return;
-  }
+      el.qrGrid.addEventListener("click", (event) => {
+        const downloadBtn = event.target.closest(".download-button");
+        if (downloadBtn) {
+          downloadQrPng(Number(downloadBtn.dataset.index));
+          return;
+        }
 
-  // Tapping the QR itself opens full-screen mode
-  const zoomTarget = event.target.closest(".qr-canvas-wrap[data-zoom-index]");
-  if (zoomTarget) {
-    openQrZoom(Number(zoomTarget.dataset.zoomIndex));
-  }
-});
+        const zoomTarget = event.target.closest(".qr-canvas-wrap[data-zoom-index]");
+        if (zoomTarget) {
+          openQrZoom(Number(zoomTarget.dataset.zoomIndex));
+        }
+      });
 
-// Keyboard support: Enter/Space on a focused QR opens the overlay
-el.qrGrid.addEventListener("keydown", (event) => {
-  if (event.key !== "Enter" && event.key !== " ") return;
-  const zoomTarget = event.target.closest(".qr-canvas-wrap[data-zoom-index]");
-  if (!zoomTarget) return;
-  event.preventDefault();
-  openQrZoom(Number(zoomTarget.dataset.zoomIndex));
-});
+      el.qrGrid.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const zoomTarget = event.target.closest(".qr-canvas-wrap[data-zoom-index]");
+        if (!zoomTarget) return;
+        event.preventDefault();
+        openQrZoom(Number(zoomTarget.dataset.zoomIndex));
+      });
 
-      // Restrict the amount field to numbers only (digits + one dot + up to 2 decimals)
+      /* ---------------- Amount field sanitization ---------------- */
+
       function sanitizeAmountInput() {
         const original = el.amount.value;
 
@@ -2899,74 +3168,60 @@ el.qrGrid.addEventListener("keydown", (event) => {
         event.preventDefault();
       });
 
-      // Clear a field's error as soon as the user edits it
-      [el.upi, el.name, el.amount].forEach((input) => {
+      [el.upi, el.name, el.amount, el.note].forEach((input) => {
         input.addEventListener("input", () => {
           if (input.classList.contains("is-invalid")) setError(input.id, "");
+          saveDraft();
         });
       });
 
-      // Quick amount chips
       document.querySelectorAll(".amount-chip").forEach((chip) => {
         chip.addEventListener("click", () => {
           el.amount.value = chip.dataset.amount;
           setError("total-amount", "");
           updateAmountPreview();
+          saveDraft();
           el.amount.focus();
         });
       });
 
-      // Clean up the print scratch area once the dialog closes
       window.addEventListener("afterprint", () => {
         el.printArea.innerHTML = "";
       });
 
-            /* ------------------------------------------------------------------ *
-       * Scroll-to-QR floating button
-       * ------------------------------------------------------------------ */
+      /* ---------------- Scroll-to-QR floating button ---------------- */
 
       const scrollToQrBtn = document.getElementById("scroll-to-qr");
-
-      // How far (px) the user must scroll before the button appears
       const SCROLL_TRIGGER = 320;
 
-      /** Is the Payment Summary tab currently visible? */
       function isSummaryTabActive() {
         return !el.summaryPanel.classList.contains("hidden");
       }
 
-      /** Show / hide the button based on tab + scroll position. */
       function updateScrollButton() {
         if (!scrollToQrBtn) return;
 
-        // Only show on the Payment Summary tab
         if (!isSummaryTabActive()) {
           scrollToQrBtn.classList.remove("is-visible");
           return;
         }
 
-        // If the progress card isn't there yet, fall back to a fixed threshold
         const card = el.progressCard;
         let shouldShow;
 
         if (card && !card.classList.contains("hidden")) {
-          // Show only after the progress card has scrolled past the top of the viewport
           const cardBottom = card.getBoundingClientRect().bottom;
           shouldShow = cardBottom < 0;
         } else {
-          // No progress card (empty summary) — fall back to scroll distance
           shouldShow = window.scrollY > SCROLL_TRIGGER;
         }
 
         scrollToQrBtn.classList.toggle("is-visible", shouldShow);
       }
 
-      /** Scroll smoothly to the "Collection Progress" card. */
       function scrollToQrSection() {
-        // Prefer the actual progress card; fall back to the heading, then the grid.
         const target = el.progressCard || el.qrGrid;
         if (!target || target.classList.contains("hidden")) {
-          // Progress card not available — fall back to the QR grid
           el.qrGrid.scrollIntoView({ behavior: "smooth", block: "start" });
           return;
         }
@@ -2983,114 +3238,204 @@ el.qrGrid.addEventListener("keydown", (event) => {
         scrollToQrBtn.addEventListener("click", scrollToQrSection);
       }
 
-      /* ------------------------------------------------------------------ *
- * Full-screen QR viewer events
- * ------------------------------------------------------------------ */
+      /* ---------------- Full-screen QR viewer events ---------------- */
 
-if (zoomClose) zoomClose.addEventListener("click", closeQrZoom);
+      if (zoomClose) zoomClose.addEventListener("click", closeQrZoom);
 
-if (zoomEl) {
-  zoomEl.addEventListener("click", (event) => {
-    // Tap the backdrop (not the QR or buttons) to close
-    if (event.target === zoomEl) closeQrZoom();
-  });
+      if (zoomEl) {
+        zoomEl.addEventListener("click", (event) => {
+          if (event.target === zoomEl) closeQrZoom();
+        });
 
-  zoomEl.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeQrZoom();
-      return;
-    }
-    if (event.key !== "Tab") return;
+        zoomEl.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            closeQrZoom();
+            return;
+          }
+          if (event.key !== "Tab") return;
 
-    const focusables = zoomEl.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (!focusables.length) return;
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-    const active = document.activeElement;
+          const focusables = zoomEl.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (!focusables.length) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          const active = document.activeElement;
 
-    if (event.shiftKey && active === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  });
-}
+          if (event.shiftKey && active === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && active === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        });
+      }
 
-// Global Escape safety net — closes the overlay even if focus
-// somehow leaves it (e.g. browser quirks, future edits).
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && zoomEl && zoomEl.classList.contains("is-open")) {
-    event.preventDefault();
-    closeQrZoom();
-  }
-});
+      // Global Escape safety net — closes the zoom viewer only if the txn modal isn't open
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
 
-if (zoomPaid) {
-  zoomPaid.addEventListener("click", () => {
-    if (zoomIndex < 0) return;
-    const box = el.qrGrid.querySelector('.paid-checkbox[data-index="' + zoomIndex + '"]');
-    if (!box) return;
+        const txnOpen = txnModal && txnModal.classList.contains("is-open");
+        if (txnOpen) return;
 
-    box.checked = !box.checked;
-    state.completed[zoomIndex] = box.checked;
-    paintCardPaidState(box);
-    renderProgress();
+        if (zoomEl && zoomEl.classList.contains("is-open")) {
+          event.preventDefault();
+          closeQrZoom();
+        }
+      });
 
-    zoomPaid.classList.toggle("is-paid", box.checked);
-    zoomPaid.setAttribute("aria-pressed", String(box.checked));
-    const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
-    if (paidText) {
-      paidText.textContent = box.checked ? "Paid (tap to undo)" : "Mark as paid";
-    }
-  });
-}
+      if (zoomPaid) {
+        zoomPaid.addEventListener("click", () => {
+          if (zoomIndex < 0) return;
 
-if (zoomDownload) {
-  zoomDownload.addEventListener("click", () => {
-    if (zoomIndex >= 0) downloadQrPng(zoomIndex);
-  });
-}
+          const alreadyPaid = Boolean(state.completed[zoomIndex]);
 
-if (zoomPrev) {
-  zoomPrev.addEventListener("click", () => stepQrZoom(-1));
-}
+          if (alreadyPaid) {
+            const box = el.qrGrid.querySelector('.paid-checkbox[data-index="' + zoomIndex + '"]');
+            if (box) {
+              suppressPaidChange = true;
+              box.checked = false;
+              suppressPaidChange = false;
+              state.completed[zoomIndex] = false;
+              state.txnIds[zoomIndex] = "";
+              removeCardTxnDisplay(zoomIndex);
+              paintCardPaidState(box);
+            }
+            renderProgress();
+            saveToStorage();
 
-if (zoomNext) {
-  zoomNext.addEventListener("click", () => stepQrZoom(1));
-}
+            zoomPaid.classList.remove("is-paid");
+            zoomPaid.setAttribute("aria-pressed", "false");
+            const paidText = zoomPaid.querySelector(".qr-zoom__paid-text");
+            if (paidText) paidText.textContent = "Mark as paid";
+          } else {
+            openTxnModal(zoomIndex, "zoom");
+          }
+        });
+      }
 
-// Arrow-key navigation while the overlay is open
-document.addEventListener("keydown", (event) => {
-  if (!zoomEl || !zoomEl.classList.contains("is-open")) return;
-  if (event.key === "ArrowLeft") {
-    event.preventDefault();
-    stepQrZoom(-1);
-  } else if (event.key === "ArrowRight") {
-    event.preventDefault();
-    stepQrZoom(1);
-  }
-});
+      if (zoomDownload) {
+        zoomDownload.addEventListener("click", () => {
+          if (zoomIndex >= 0) downloadQrPng(zoomIndex);
+        });
+      }
 
-      // Recompute on scroll (passive = no jank)
+      if (zoomPrev) {
+        zoomPrev.addEventListener("click", () => stepQrZoom(-1));
+      }
+
+      if (zoomNext) {
+        zoomNext.addEventListener("click", () => stepQrZoom(1));
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (!zoomEl || !zoomEl.classList.contains("is-open")) return;
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          stepQrZoom(-1);
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          stepQrZoom(1);
+        }
+      });
+
       window.addEventListener("scroll", updateScrollButton, { passive: true });
-
-      // Recompute on resize (rotation, window resize)
       window.addEventListener("resize", updateScrollButton);
 
-      /* ------------------------------------------------------------------ *
-       * Init
-       * ------------------------------------------------------------------ */
+      /* ---------------- Reuse from history ---------------- */
+
+      function applyReuseFromUrl() {
+        let id = null;
+        try {
+          id = new URLSearchParams(window.location.search).get("reuse");
+        } catch (error) {
+          return false;
+        }
+        if (!id) return false;
+
+        const entry = readHistory().find((item) => item && item.id === id);
+        if (!entry || !entry.details) return false;
+
+        el.upi.value = entry.details.upi || "";
+        el.name.value = entry.details.name || "";
+        el.amount.value =
+          entry.details.amountPaise > 0 ? String(entry.details.amountPaise / 100) : "";
+        el.note.value = entry.details.note || "";
+
+        updateAmountPreview();
+        setStatus(el.status, "Details loaded from history — review and generate new QR codes.", "info");
+
+        // Do NOT set historyId here — reuse starts a fresh collection.
+        // Any previous active session is intentionally left untouched in history.
+
+        try {
+          window.history.replaceState(null, "", window.location.pathname);
+        } catch (error) {}
+
+        switchTab("details");
+        return true;
+      }
+
+      /* ---------------- Init ---------------- */
 
       function init() {
         el.upi.placeholder = "example@upi";
         el.name.placeholder = "John Doe";
         el.amount.placeholder = "4500";
         el.note.placeholder = "Invoice 001";
+
+        if (applyReuseFromUrl()) {
+          renderSummary();
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        const saved = loadFromStorage();
+
+        if (saved) {
+          historyId = typeof saved.historyId === "string" && saved.historyId ? saved.historyId : null;
+          state.details = saved.details;
+          state.payments = saved.payments.map((p) => ({
+            paise: p.paise,
+            uri: buildUpiUri(saved.details, p.paise)
+          }));
+
+          state.completed =
+            Array.isArray(saved.completed) && saved.completed.length === state.payments.length
+              ? saved.completed.slice()
+              : new Array(state.payments.length).fill(false);
+
+          state.txnIds =
+            Array.isArray(saved.txnIds) && saved.txnIds.length === state.payments.length
+              ? saved.txnIds.slice()
+              : new Array(state.payments.length).fill("");
+
+          lastPercentShown = -1;
+
+          el.upi.value = saved.details.upi || "";
+          el.name.value = saved.details.name || "";
+          el.amount.value = (saved.details.amountPaise / 100).toString();
+          el.note.value = saved.details.note || "";
+
+          ensureQrLibrary().then(() => {
+            renderSummary();
+            switchTab("summary");
+            if (window.lucide) window.lucide.createIcons();
+          });
+          return;
+        }
+
+        /* No active session — restore unsaved draft if any */
+        const draft = loadDraft();
+        if (draft) {
+          el.upi.value = draft.upi || "";
+          el.name.value = draft.name || "";
+          el.amount.value = draft.amount || "";
+          el.note.value = draft.note || "";
+          updateAmountPreview();
+        }
 
         renderSummary();
         if (window.lucide) window.lucide.createIcons();
